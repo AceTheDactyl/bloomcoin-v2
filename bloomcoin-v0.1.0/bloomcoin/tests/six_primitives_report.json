@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-01-29T22:56:13.756474",
+  "test_results": {
+    "core_primitives": "FAILED: No module named 'scipy'",
+    "bloomcoin_operations": "FAILED: No module named 'scipy'",
+    "mix_barrier": "FAILED: No module named 'matplotlib'",
+    "quantum_classical": "FAILED: No module named 'scipy'"
+  },
+  "all_tests_passed": false,
+  "framework_version": "1.0",
+  "bloomcoin_version": "0.1.0"
+}
