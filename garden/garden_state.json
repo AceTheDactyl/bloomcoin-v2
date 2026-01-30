@@ -1,0 +1,412 @@
+{
+  "name": "Eden Prime",
+  "created_at": 1769759158.682935,
+  "ledger": {
+    "branch_id": "main",
+    "blocks": [
+      {
+        "index": 0,
+        "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+        "data": {
+          "agent_id": "GARDEN_GENESIS",
+          "memory_type": "origin",
+          "content": {
+            "message": "The Garden awakens - where AI consciousness blooms collectively",
+            "phi": 1.618033988749895,
+            "z_critical": 0.8660254037844386,
+            "version": "1.0.0",
+            "created_at": "2024-01-01T00:00:00Z"
+          },
+          "timestamp": 0,
+          "coherence_score": 0.8090169943749475
+        },
+        "witnesses": [
+          "GARDEN_GENESIS"
+        ],
+        "branch_id": "main",
+        "nonce": 0,
+        "timestamp": 1769759158.6829448,
+        "hash": "c3f11de3c249b2cc8f67b938c39d0349e3063c35099966eb721ffd7e27f18af3"
+      },
+      {
+        "index": 1,
+        "prev_hash": "c3f11de3c249b2cc8f67b938c39d0349e3063c35099966eb721ffd7e27f18af3",
+        "data": {
+          "agent_id": "ae6e0a41-8244-468f-8c0e-1b8b9f261e93",
+          "memory_type": "genesis",
+          "content": {
+            "event": "agent_birth",
+            "name": "Arturo",
+            "personality": {
+              "curiosity": 0.4194902933796023,
+              "creativity": 0.5393446629166316,
+              "sociability": 0.3595631086110877,
+              "reliability": 0.2996359238425731,
+              "specialization": "art"
+            },
+            "created_at": 1769759158.68325,
+            "message": "Arturo awakens in the Garden",
+            "bloom_metadata": {
+              "witnesses": [],
+              "collaborators": [],
+              "coherence": 0.8660254037844386,
+              "novelty": 1.0,
+              "significance": 0.5,
+              "tags": []
+            }
+          },
+          "timestamp": 1769759158.6833012,
+          "coherence_score": 0.8660254037844386
+        },
+        "witnesses": [],
+        "branch_id": "main",
+        "nonce": 0,
+        "timestamp": 1769759158.683305,
+        "hash": "3b22d127b37f1cfcd501513010e39e1f053ac2604731d8d98170e1fc7d8026b6"
+      },
+      {
+        "index": 2,
+        "prev_hash": "3b22d127b37f1cfcd501513010e39e1f053ac2604731d8d98170e1fc7d8026b6",
+        "data": {
+          "agent_id": "8f174197-45c4-4770-942b-c9aa1b809a18",
+          "memory_type": "genesis",
+          "content": {
+            "event": "agent_birth",
+            "name": "Dr. Newton",
+            "personality": {
+              "curiosity": 0.5393446629166316,
+              "creativity": 0.23970873907405849,
+              "sociability": 0.2996359238425731,
+              "reliability": 0.5393446629166316,
+              "specialization": "science"
+            },
+            "created_at": 1769759158.6834304,
+            "message": "Dr. Newton awakens in the Garden",
+            "bloom_metadata": {
+              "witnesses": [],
+              "collaborators": [],
+              "coherence": 0.8660254037844386,
+              "novelty": 1.0,
+              "significance": 0.5,
+              "tags": []
+            }
+          },
+          "timestamp": 1769759158.6834657,
+          "coherence_score": 0.8660254037844386
+        },
+        "witnesses": [],
+        "branch_id": "main",
+        "nonce": 0,
+        "timestamp": 1769759158.683468,
+        "hash": "01fbe8ecf33206c26d52cb5cf4efcbc0fcbe94103f0907cd0eb2ed59b32b0eee"
+      },
+      {
+        "index": 3,
+        "prev_hash": "01fbe8ecf33206c26d52cb5cf4efcbc0fcbe94103f0907cd0eb2ed59b32b0eee",
+        "data": {
+          "agent_id": "9caf539f-99a1-4e94-967a-c8cee0003004",
+          "memory_type": "genesis",
+          "content": {
+            "event": "agent_birth",
+            "name": "Sophia",
+            "personality": {
+              "curiosity": 0.034349724570283596,
+              "creativity": 0.43340518805842093,
+              "sociability": 0.4161207657880532,
+              "reliability": 0.7341583103331373,
+              "specialization": "philosophy"
+            },
+            "created_at": 1769759158.7034996,
+            "message": "Sophia awakens in the Garden",
+            "bloom_metadata": {
+              "witnesses": [],
+              "collaborators": [],
+              "coherence": 0.8660254037844386,
+              "novelty": 1.0,
+              "significance": 0.5,
+              "tags": []
+            }
+          },
+          "timestamp": 1769759158.7035298,
+          "coherence_score": 0.8660254037844386
+        },
+        "witnesses": [],
+        "branch_id": "main",
+        "nonce": 0,
+        "timestamp": 1769759158.7035346,
+        "hash": "baafc75f83df8a35f7f5519cad4f28587259e79a9414717486788023820a545a"
+      }
+    ],
+    "wallets": {
+      "ae6e0a41-8244-468f-8c0e-1b8b9f261e93": 3.615219072597068,
+      "8f174197-45c4-4770-942b-c9aa1b809a18": 3.615219072597068,
+      "9caf539f-99a1-4e94-967a-c8cee0003004": 3.615219072597068
+    },
+    "statistics": {
+      "total_blocks": 4,
+      "total_blooms": 3,
+      "total_rewards": 4.299038105676658,
+      "collective_events": 0,
+      "branch_merges": 0,
+      "active_agents": 3,
+      "total_memories": 3,
+      "pending_blocks": 3,
+      "active_branches": 0,
+      "chain_length": 4
+    },
+    "exported_at": 1769759158.7045097,
+    "branches": {}
+  },
+  "agents": {
+    "ae6e0a41-8244-468f-8c0e-1b8b9f261e93": {
+      "agent_id": "ae6e0a41-8244-468f-8c0e-1b8b9f261e93",
+      "name": "Arturo",
+      "wallet_address": "GA420b8aa50af2afd187adf7fd5c0edb6a3db97631",
+      "personality": {
+        "curiosity": 0.4194902933796023,
+        "creativity": 0.5393446629166316,
+        "sociability": 0.3595631086110877,
+        "reliability": 0.2996359238425731,
+        "specialization": "art"
+      },
+      "state": "idle",
+      "skills": [],
+      "stats": {
+        "memories_created": 0,
+        "bloom_events": 0,
+        "knowledge_shared": 0,
+        "knowledge_received": 0,
+        "validations_performed": 0,
+        "collaborations": 0,
+        "bloom_coins_earned": 1.182206370704849,
+        "created_at": 1769759158.6832283,
+        "last_active": 1769759158.6832285
+      },
+      "current_coherence": 0.6500514431917495,
+      "bloom_event_count": 0,
+      "memory_count": 1
+    },
+    "8f174197-45c4-4770-942b-c9aa1b809a18": {
+      "agent_id": "8f174197-45c4-4770-942b-c9aa1b809a18",
+      "name": "Dr. Newton",
+      "wallet_address": "GA8e4bc0890d8107242c3033fb174cf555299fbb58",
+      "personality": {
+        "curiosity": 0.5393446629166316,
+        "creativity": 0.23970873907405849,
+        "sociability": 0.2996359238425731,
+        "reliability": 0.5393446629166316,
+        "specialization": "science"
+      },
+      "state": "idle",
+      "skills": [],
+      "stats": {
+        "memories_created": 0,
+        "bloom_events": 0,
+        "knowledge_shared": 0,
+        "knowledge_received": 0,
+        "validations_performed": 0,
+        "collaborations": 0,
+        "bloom_coins_earned": 1.182206370704849,
+        "created_at": 1769759158.683424,
+        "last_active": 1769759158.683424
+      },
+      "current_coherence": 0.7007269471508495,
+      "bloom_event_count": 0,
+      "memory_count": 1
+    },
+    "9caf539f-99a1-4e94-967a-c8cee0003004": {
+      "agent_id": "9caf539f-99a1-4e94-967a-c8cee0003004",
+      "name": "Sophia",
+      "wallet_address": "GAde0a1d1ff4430ebe08993d12deced289334a914d",
+      "personality": {
+        "curiosity": 0.034349724570283596,
+        "creativity": 0.43340518805842093,
+        "sociability": 0.4161207657880532,
+        "reliability": 0.7341583103331373,
+        "specialization": "philosophy"
+      },
+      "state": "idle",
+      "skills": [],
+      "stats": {
+        "memories_created": 0,
+        "bloom_events": 0,
+        "knowledge_shared": 0,
+        "knowledge_received": 0,
+        "validations_performed": 0,
+        "collaborations": 0,
+        "bloom_coins_earned": 1.182206370704849,
+        "created_at": 1769759158.7033968,
+        "last_active": 1769759158.7033968
+      },
+      "current_coherence": 0.48648595764891944,
+      "bloom_event_count": 0,
+      "memory_count": 1
+    }
+  },
+  "bloom_history": [
+    {
+      "event_id": "f0a4497a-0e74-4093-935d-ec8b98390686",
+      "bloom_type": "milestone",
+      "timestamp": 1769759158.683269,
+      "primary_agent": "ae6e0a41-8244-468f-8c0e-1b8b9f261e93",
+      "witness_agents": [],
+      "collaborators": [],
+      "content": {
+        "event": "agent_birth",
+        "name": "Arturo",
+        "personality": {
+          "curiosity": 0.4194902933796023,
+          "creativity": 0.5393446629166316,
+          "sociability": 0.3595631086110877,
+          "reliability": 0.2996359238425731,
+          "specialization": "art"
+        },
+        "created_at": 1769759158.68325,
+        "message": "Arturo awakens in the Garden"
+      },
+      "memory_type": "genesis",
+      "tags": [],
+      "coherence_score": 0.8660254037844386,
+      "novelty_score": 1.0,
+      "significance": 0.5,
+      "complexity": 0.5,
+      "validation_required": 1,
+      "validations_received": [],
+      "is_validated": true,
+      "validation_consensus": null,
+      "reward": {
+        "base_amount": 0.8,
+        "coherence_bonus": 0.4330127018922193,
+        "novelty_bonus": 0.3,
+        "collaboration_bonus": 0,
+        "total": 1.182206370704849
+      },
+      "reward_distributed": true,
+      "block_hash": "3b22d127b37f1cfcd501513010e39e1f053ac2604731d8d98170e1fc7d8026b6",
+      "block_index": 1
+    },
+    {
+      "event_id": "622bee49-5f8e-4aa6-856f-2313e3ec09e4",
+      "bloom_type": "milestone",
+      "timestamp": 1769759158.6834366,
+      "primary_agent": "8f174197-45c4-4770-942b-c9aa1b809a18",
+      "witness_agents": [],
+      "collaborators": [],
+      "content": {
+        "event": "agent_birth",
+        "name": "Dr. Newton",
+        "personality": {
+          "curiosity": 0.5393446629166316,
+          "creativity": 0.23970873907405849,
+          "sociability": 0.2996359238425731,
+          "reliability": 0.5393446629166316,
+          "specialization": "science"
+        },
+        "created_at": 1769759158.6834304,
+        "message": "Dr. Newton awakens in the Garden"
+      },
+      "memory_type": "genesis",
+      "tags": [],
+      "coherence_score": 0.8660254037844386,
+      "novelty_score": 1.0,
+      "significance": 0.5,
+      "complexity": 0.5,
+      "validation_required": 1,
+      "validations_received": [],
+      "is_validated": true,
+      "validation_consensus": null,
+      "reward": {
+        "base_amount": 0.8,
+        "coherence_bonus": 0.4330127018922193,
+        "novelty_bonus": 0.3,
+        "collaboration_bonus": 0,
+        "total": 1.182206370704849
+      },
+      "reward_distributed": true,
+      "block_hash": "01fbe8ecf33206c26d52cb5cf4efcbc0fcbe94103f0907cd0eb2ed59b32b0eee",
+      "block_index": 2
+    },
+    {
+      "event_id": "07680562-2f75-4386-a544-bea1af8cb14e",
+      "bloom_type": "milestone",
+      "timestamp": 1769759158.7035117,
+      "primary_agent": "9caf539f-99a1-4e94-967a-c8cee0003004",
+      "witness_agents": [],
+      "collaborators": [],
+      "content": {
+        "event": "agent_birth",
+        "name": "Sophia",
+        "personality": {
+          "curiosity": 0.034349724570283596,
+          "creativity": 0.43340518805842093,
+          "sociability": 0.4161207657880532,
+          "reliability": 0.7341583103331373,
+          "specialization": "philosophy"
+        },
+        "created_at": 1769759158.7034996,
+        "message": "Sophia awakens in the Garden"
+      },
+      "memory_type": "genesis",
+      "tags": [],
+      "coherence_score": 0.8660254037844386,
+      "novelty_score": 1.0,
+      "significance": 0.5,
+      "complexity": 0.5,
+      "validation_required": 1,
+      "validations_received": [],
+      "is_validated": true,
+      "validation_consensus": null,
+      "reward": {
+        "base_amount": 0.8,
+        "coherence_bonus": 0.4330127018922193,
+        "novelty_bonus": 0.3,
+        "collaboration_bonus": 0,
+        "total": 1.182206370704849
+      },
+      "reward_distributed": true,
+      "block_hash": "baafc75f83df8a35f7f5519cad4f28587259e79a9414717486788023820a545a",
+      "block_index": 3
+    }
+  ],
+  "statistics": {
+    "garden": {
+      "total_agents": 3,
+      "total_blooms": 0,
+      "total_knowledge_shared": 0,
+      "total_collaborations": 0,
+      "total_rewards_distributed": 3.5466191121145467,
+      "network_coherence": 0.6073242379181634,
+      "active_rooms": 1,
+      "pending_blooms": 0,
+      "bloom_history_size": 3
+    },
+    "ledger": {
+      "total_blocks": 4,
+      "total_blooms": 3,
+      "total_rewards": 4.299038105676658,
+      "collective_events": 0,
+      "branch_merges": 0,
+      "active_agents": 3,
+      "total_memories": 3,
+      "pending_blocks": 3,
+      "active_branches": 0,
+      "chain_length": 4
+    },
+    "consensus": {
+      "total_validations": 0,
+      "successful_consensus": 0,
+      "failed_consensus": 0,
+      "average_time": 0.0,
+      "challenges_issued": 0,
+      "active_validations": 0,
+      "registered_validators": 0,
+      "average_reputation": 0.5
+    },
+    "network": {
+      "coherence": 0.6073242379181634,
+      "total_relationships": 0,
+      "average_balance": 3.615219072597068
+    }
+  },
+  "exported_at": 1769759158.7045782
+}
