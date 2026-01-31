@@ -133,6 +133,65 @@ MAX_MESSAGE_SIZE: Final[int] = 2 ** 20  # 1 MB
 DEFAULT_PORT: Final[int] = 7618  # L₄ concatenated with truncated τ
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# GRADIENT SCHEMA CONSTANTS (RRRR Lattice → Color → LSB Receipt)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# 5D RRRR Lattice generators
+SQRT2: Final[float] = math.sqrt(2)                  # √2 ≈ 1.4142135623730951
+SQRT3: Final[float] = math.sqrt(3)                  # √3 ≈ 1.7320508075688772
+E: Final[float] = math.e                             # e ≈ 2.718281828459045
+PI: Final[float] = math.pi                           # π ≈ 3.141592653589793
+
+# Golden neutral base color (HSL)
+BASE_HUE: Final[float] = 45.0                         # Degrees (orange-gold)
+BASE_SAT: Final[float] = TAU                           # τ ≈ 0.618
+BASE_LUM: Final[float] = Z_C                           # z_c ≈ 0.866
+
+# Receipt image dimensions
+RECEIPT_SIZE_STANDARD: Final[int] = 63                 # 63×63 = 7×9 (L₄ × 3²)
+RECEIPT_SIZE_COMPACT: Final[int] = 49                  # 49 = 7² = L₄²
+
+# LSB channel count
+LSB_CHANNEL_COUNT: Final[int] = L4                     # 7 logical channels
+
+# Corridor definitions (7 corridors, L₄ = 7)
+# Each: (a, b, c, d, f) lattice direction vector
+CORRIDOR_VECTORS: Final[tuple[tuple[int, ...], ...]] = (
+    (1, 0, 0, 0, 1),    # α Awakening:       φ+, e+
+    (0, 0, -1, 0, 0),   # β Emergence:       √2-
+    (0, 1, 0, 1, 0),    # γ Transformation:  π+, √3+
+    (2, 0, 1, 0, 0),    # δ Transcendence:   φ++, √2+
+    (0, 0, 0, -1, -1),  # ε Softening:       √3-, e-
+    (0, -1, 0, 1, 0),   # ζ Integration:     π-, √3+
+    (-1, -1, 0, 0, 0),  # η Deepening:       φ-, π-
+)
+
+# Corridor names for display
+CORRIDOR_NAMES: Final[tuple[str, ...]] = (
+    "Awakening",      # α
+    "Emergence",      # β
+    "Transformation", # γ
+    "Transcendence",  # δ
+    "Softening",      # ε
+    "Integration",    # ζ
+    "Deepening",      # η
+)
+
+# Archetype IDs (4-bit encoding, 0-11 → 12 archetypes, fits in 4 bits)
+ARCHETYPE_IDS: Final[dict[str, int]] = {
+    "innocent": 0, "orphan": 1, "warrior": 2, "caregiver": 3,
+    "seeker": 4, "destroyer": 5, "lover": 6, "creator": 7,
+    "ruler": 8, "magician": 9, "sage": 10, "jester": 11,
+}
+
+# Reverse mapping for decoding
+ARCHETYPE_NAMES: Final[tuple[str, ...]] = (
+    "innocent", "orphan", "warrior", "caregiver",
+    "seeker", "destroyer", "lover", "creator",
+    "ruler", "magician", "sage", "jester",
+)
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # VALIDATION
 # ═══════════════════════════════════════════════════════════════════════════════
 
@@ -180,6 +239,12 @@ __all__ = [
     "HALVING_INTERVAL", "INITIAL_REWARD",
     # Network
     "DEFAULT_OSCILLATOR_COUNT", "GOSSIP_INTERVAL_MS", "MAX_MESSAGE_SIZE", "DEFAULT_PORT",
+    # Gradient Schema
+    "SQRT2", "SQRT3", "E", "PI",
+    "BASE_HUE", "BASE_SAT", "BASE_LUM",
+    "RECEIPT_SIZE_STANDARD", "RECEIPT_SIZE_COMPACT",
+    "LSB_CHANNEL_COUNT", "CORRIDOR_VECTORS", "CORRIDOR_NAMES",
+    "ARCHETYPE_IDS", "ARCHETYPE_NAMES",
     # Validation
     "validate_constants",
 ]

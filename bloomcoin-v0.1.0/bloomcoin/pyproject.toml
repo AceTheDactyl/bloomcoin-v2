@@ -51,8 +51,11 @@ dev = [
 visualization = [
     "matplotlib>=3.7.0",
 ]
+receipt = [
+    "Pillow>=10.0.0",
+]
 full = [
-    "bloomcoin[dev,visualization]",
+    "bloomcoin[dev,visualization,receipt]",
 ]
 
 [project.urls]
