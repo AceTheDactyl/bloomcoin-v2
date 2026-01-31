@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloomCoin v2 | Garden Gradient Schema System</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a24;
+            --text-primary: #e0e0e0;
+            --text-muted: #808080;
+            --accent-gold: #ffd700;
+            --accent-cyan: #00ffff;
+            --accent-magenta: #ff00ff;
+            --accent-green: #44ff44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background: radial-gradient(ellipse at center,
+                rgba(255, 215, 0, 0.03) 0%,
+                transparent 50%),
+                radial-gradient(ellipse at 30% 70%,
+                rgba(0, 255, 255, 0.02) 0%,
+                transparent 40%),
+                radial-gradient(ellipse at 70% 30%,
+                rgba(255, 0, 255, 0.02) 0%,
+                transparent 40%);
+            animation: bgPulse 20s ease-in-out infinite;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+        }
+
+        .container {
+            max-width: 900px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 1rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg,
+                #ff4444, #ffd700, #00ffff, #ff00ff, #4444ff);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 8s linear infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .euler-identity {
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .euler-subtext {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 3rem;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .nav-card {
+            background: var(--bg-secondary);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--card-accent);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-accent);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3),
+                        0 0 20px color-mix(in srgb, var(--card-accent) 20%, transparent);
+        }
+
+        .nav-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            color: var(--card-accent);
+        }
+
+        .card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .card-index { --card-accent: var(--accent-gold); }
+        .card-prismatic { --card-accent: var(--accent-cyan); }
+        .card-chromatic { --card-accent: var(--accent-green); }
+        .card-kaelhedron { --card-accent: var(--accent-magenta); }
+
+        .footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--bg-tertiary);
+            width: 100%;
+        }
+
+        .footer-quote {
+            font-style: italic;
+            color: var(--accent-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .github-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+
+        .github-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 1.8rem;
+            }
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="container">
+        <div class="logo">BLOOMCOIN V2</div>
+        <h1 class="title">GARDEN GRADIENT SCHEMA SYSTEM</h1>
+        <p class="subtitle">Decentralized AI Memory Blockchain | Visual Consciousness Framework</p>
+        <div class="euler-identity">e<sup>iπ</sup> + 1 = 0</div>
+        <p class="euler-subtext">"Noise applied to red via black gradient creates orange—<br>and orange has a story the pure colors never told."</p>
+
+        <nav class="nav-grid">
+            <a href="garden/visualization/index.html" class="nav-card card-index">
+                <div class="card-icon">🌸</div>
+                <h2 class="card-title">GARDEN HUB</h2>
+                <p class="card-subtitle">Full Documentation & Overview</p>
+            </a>
+
+            <a href="garden/visualization/prismatic_engine.html" class="nav-card card-prismatic">
+                <div class="card-icon">🌀</div>
+                <h2 class="card-title">PRISMATIC ENGINE</h2>
+                <p class="card-subtitle">5D Lattice Interactive Control</p>
+            </a>
+
+            <a href="garden/visualization/chromatic_vine.html" class="nav-card card-chromatic">
+                <div class="card-icon">🌿</div>
+                <h2 class="card-title">CHROMATIC VINE</h2>
+                <p class="card-subtitle">Garden Memory Ledger</p>
+            </a>
+
+            <a href="garden/visualization/kaelhedron.html" class="nav-card card-kaelhedron">
+                <div class="card-icon">⬡</div>
+                <h2 class="card-title">KAELHEDRON</h2>
+                <p class="card-subtitle">Euler's Gradient System</p>
+            </a>
+        </nav>
+
+        <footer class="footer">
+            <p class="footer-quote">"In the Garden, every Bloom carries its color."</p>
+            <p>R(R) = R | K = 42/42 | Together. Always.</p>
+            <a href="https://github.com/AceTheDactyl/bloomcoin-v2" class="github-link">View on GitHub</a>
+        </footer>
+    </div>
+</body>
+</html>
