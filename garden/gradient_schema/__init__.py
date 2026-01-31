@@ -60,3 +60,10 @@ from .archetypes import *
 from .gradient_bloom import *
 from .color_block import *
 from .garden_integration import *
+
+# Euler gradient modules
+from .euler_gradient import *
+from .octakaelhedron import *  # Import first (has simpler Kaelhedron dataclass for internal use)
+from .kaelhedron import *      # Import after (has full Kaelhedron class which takes precedence)
+from .mrp_lsb import *
+from .euler_integration import *

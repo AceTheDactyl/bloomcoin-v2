@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE KAELHEDRON | Euler's Gradient System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            /* Mathematical Constants */
+            --phi: 1.618033988749895;
+            --tau-golden: 0.618033988749895;
+            --pi: 3.141592653589793;
+            --e: 2.718281828459045;
+
+            /* Polarity Colors */
+            --plus-color: #00ff88;
+            --minus-color: #ff4466;
+            --paradox-color: #aa44ff;
+            --neutral-color: #888899;
+
+            /* Theme Colors */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #e0e0e8;
+            --text-secondary: #8888aa;
+            --accent: #6644ff;
+            --glow-color: #4422ff;
+            --golden: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, #15151f 0%, var(--bg-primary) 100%);
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            background: linear-gradient(90deg,
+                var(--plus-color),
+                var(--golden),
+                var(--paradox-color),
+                var(--minus-color),
+                var(--paradox-color),
+                var(--golden),
+                var(--plus-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 6s ease infinite;
+            background-size: 300% 100%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header .euler-identity {
+            font-size: 1.4rem;
+            color: var(--golden);
+            margin-top: 10px;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 8px;
+            letter-spacing: 0.15em;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        /* Section Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2a3a;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: #3a3a5a;
+            box-shadow: 0 0 25px rgba(100, 68, 255, 0.15);
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.12em;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title .badge {
+            font-size: 0.7rem;
+            background: var(--bg-tertiary);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: crosshair;
+        }
+
+        /* Euler Gradient Panel */
+        .euler-panel {
+            grid-column: span 2;
+        }
+
+        .euler-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .euler-values {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .euler-value {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .euler-value .label {
+            color: var(--text-secondary);
+        }
+
+        .euler-value .value {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .euler-value.plus .value { color: var(--plus-color); }
+        .euler-value.minus .value { color: var(--minus-color); }
+        .euler-value.paradox .value { color: var(--paradox-color); }
+        .euler-value.golden .value { color: var(--golden); }
+
+        /* Fano and Heawood */
+        .graph-panel {
+            min-height: 350px;
+        }
+
+        .point-info {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            min-height: 60px;
+        }
+
+        /* Kaelhedron Panel */
+        .kaelhedron-panel {
+            grid-column: span 2;
+        }
+
+        .kaelhedron-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .kaelhedron-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .stat-row .label { color: var(--text-secondary); }
+        .stat-row .value { font-weight: 600; }
+        .stat-row.plus .value { color: var(--plus-color); }
+        .stat-row.minus .value { color: var(--minus-color); }
+
+        /* Double Well Panel */
+        .well-controls {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-row label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            min-width: 50px;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: linear-gradient(90deg, var(--plus-color), var(--paradox-color), var(--minus-color));
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .slider-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .slider-row .value-display {
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: right;
+            color: var(--golden);
+        }
+
+        /* Base-4 Display */
+        .base4-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .base4-item {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .base4-item:hover {
+            border-color: var(--accent);
+        }
+
+        .base4-item.selected {
+            border-color: var(--golden);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .base4-item .digit {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .base4-item .complex {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* K-Formation Panel */
+        .k-formation {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .k-display {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .k-display .k-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--plus-color), var(--golden));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .k-display .k-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .k-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+
+        .k-control label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .k-control input[type="range"] {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .k-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .k-control .value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .toggle-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: var(--text-primary);
+            border-color: var(--accent);
+        }
+
+        /* Numerical Facts Panel */
+        .facts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .fact-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .fact-row:hover {
+            background: #252535;
+        }
+
+        .fact-row .equation {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .fact-row .description {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+        }
+
+        .fact-row.highlight {
+            border-left: 3px solid var(--golden);
+        }
+
+        /* V4 Klein Group Display */
+        .v4-table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .v4-table th, .v4-table td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .v4-table th {
+            background: var(--bg-tertiary);
+            color: var(--accent);
+        }
+
+        .v4-table td {
+            background: var(--bg-primary);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            padding: 10px 15px;
+            background: #1a1a25;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 250px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        .footer .formula {
+            color: var(--golden);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>THE KAELHEDRON</h1>
+        <div class="euler-identity">e<sup>i&pi;</sup> + 1 = 0</div>
+        <div class="subtitle">EULER'S GRADIENT SYSTEM | 42 VERTICES | 3 SCALES</div>
+    </div>
+
+    <div class="container">
+        <!-- Euler Gradient Arc Panel -->
+        <div class="panel euler-panel">
+            <div class="panel-title">
+                EULER GRADIENT ARC
+                <span class="badge">Interactive</span>
+            </div>
+            <div class="euler-display">
+                <div class="canvas-container">
+                    <canvas id="eulerCanvas" width="320" height="280"></canvas>
+                </div>
+                <div class="euler-values">
+                    <div class="euler-value">
+                        <span class="label">&theta; (theta)</span>
+                        <span class="value" id="thetaValue">0.000</span>
+                    </div>
+                    <div class="euler-value plus">
+                        <span class="label">cos(&theta;) = polarity</span>
+                        <span class="value" id="polarityValue">1.000</span>
+                    </div>
+                    <div class="euler-value paradox">
+                        <span class="label">sin(&theta;) = uncertainty</span>
+                        <span class="value" id="uncertaintyValue">0.000</span>
+                    </div>
+                    <div class="euler-value">
+                        <span class="label">e<sup>i&theta;</sup> complex</span>
+                        <span class="value" id="complexValue">1 + 0i</span>
+                    </div>
+                    <div class="euler-value golden">
+                        <span class="label">&phi;<sup>-1</sup> barrier</span>
+                        <span class="value">0.618</span>
+                    </div>
+                    <div class="euler-value">
+                        <span class="label">Zone</span>
+                        <span class="value" id="zoneValue">PLUS (+1)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- K-Formation Panel -->
+        <div class="panel">
+            <div class="panel-title">
+                K-FORMATION
+                <span class="badge">Control</span>
+            </div>
+            <div class="k-formation">
+                <div class="k-display">
+                    <div class="k-value" id="kValue">42/42</div>
+                    <div class="k-label">KAELHEDRON INTEGRITY</div>
+                </div>
+                <div class="k-control">
+                    <label>&kappa; value</label>
+                    <input type="range" id="kappaSlider" min="0" max="100" value="62">
+                    <span class="value" id="kappaDisplay">0.62</span>
+                </div>
+                <div class="k-control">
+                    <label>R depth</label>
+                    <input type="range" id="rDepthSlider" min="0" max="7" value="3">
+                    <span class="value" id="rDepthDisplay">3</span>
+                </div>
+                <div class="k-control">
+                    <label>Q charge</label>
+                    <input type="range" id="qChargeSlider" min="-3" max="3" value="0">
+                    <span class="value" id="qChargeDisplay">0</span>
+                </div>
+                <div class="toggle-row">
+                    <button class="toggle-btn active" id="phase0">Phase 0</button>
+                    <button class="toggle-btn" id="phase1">Phase 1</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fano Plane Panel -->
+        <div class="panel graph-panel">
+            <div class="panel-title">
+                FANO PLANE
+                <span class="badge">PG(2,2)</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="fanoCanvas" width="280" height="240"></canvas>
+            </div>
+            <div class="point-info" id="fanoInfo">
+                Click a point to see its properties. 7 points, 7 lines.
+                <br>Line 4 (PLUS line): {0, 4, 5}
+            </div>
+        </div>
+
+        <!-- Heawood Graph Panel -->
+        <div class="panel graph-panel">
+            <div class="panel-title">
+                HEAWOOD GRAPH
+                <span class="badge">14 vertices</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="heawoodCanvas" width="280" height="240"></canvas>
+            </div>
+            <div class="point-info" id="heawoodInfo">
+                Bipartite incidence graph of the Fano plane.
+                <br>Points (0-6) | Lines (7-13)
+            </div>
+        </div>
+
+        <!-- Base-4 Display -->
+        <div class="panel">
+            <div class="panel-title">
+                BASE-4 ROOTS OF UNITY
+                <span class="badge">V<sub>4</sub></span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="base4Canvas" width="200" height="180"></canvas>
+            </div>
+            <div class="base4-grid">
+                <div class="base4-item selected" data-digit="0">
+                    <div class="digit">0</div>
+                    <div class="complex">+1</div>
+                </div>
+                <div class="base4-item" data-digit="1">
+                    <div class="digit">1</div>
+                    <div class="complex">+i</div>
+                </div>
+                <div class="base4-item" data-digit="2">
+                    <div class="digit">2</div>
+                    <div class="complex">-1</div>
+                </div>
+                <div class="base4-item" data-digit="3">
+                    <div class="digit">3</div>
+                    <div class="complex">-i</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kaelhedron Structure Panel -->
+        <div class="panel kaelhedron-panel">
+            <div class="panel-title">
+                KAELHEDRON STRUCTURE
+                <span class="badge">42 = 2 x 3 x 7</span>
+            </div>
+            <div class="kaelhedron-layout">
+                <div class="canvas-container">
+                    <canvas id="kaelhedronCanvas" width="400" height="320"></canvas>
+                </div>
+                <div class="kaelhedron-stats">
+                    <div class="stat-row">
+                        <span class="label">Total Vertices</span>
+                        <span class="value">42</span>
+                    </div>
+                    <div class="stat-row plus">
+                        <span class="label">PLUS vertices</span>
+                        <span class="value">18</span>
+                    </div>
+                    <div class="stat-row minus">
+                        <span class="label">MINUS vertices</span>
+                        <span class="value">24</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="label">Ratio</span>
+                        <span class="value">18:24 = 3:4</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="label">Scales</span>
+                        <span class="value">3 (concentric)</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="label">Per Scale</span>
+                        <span class="value">14 vertices</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="label">Automorphisms</span>
+                        <span class="value">|GL(3,2)| = 168</span>
+                    </div>
+                    <div id="vertexInfo" class="stat-row" style="display:none;">
+                        <span class="label">Selected</span>
+                        <span class="value">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Double-Well Potential Panel -->
+        <div class="panel">
+            <div class="panel-title">
+                DOUBLE-WELL POTENTIAL
+                <span class="badge">V(&kappa;)</span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="wellCanvas" width="280" height="200"></canvas>
+            </div>
+            <div class="well-controls">
+                <div class="slider-row">
+                    <label>&kappa;</label>
+                    <input type="range" id="wellKappaSlider" min="0" max="100" value="47">
+                    <span class="value-display" id="wellKappaDisplay">0.472</span>
+                </div>
+                <div class="euler-values" style="margin-top: 10px;">
+                    <div class="euler-value plus">
+                        <span class="label">&mu;<sub>1</sub> (lower well)</span>
+                        <span class="value">0.472</span>
+                    </div>
+                    <div class="euler-value golden">
+                        <span class="label">&phi;<sup>-1</sup> (barrier)</span>
+                        <span class="value">0.618</span>
+                    </div>
+                    <div class="euler-value minus">
+                        <span class="label">&mu;<sub>2</sub> (upper well)</span>
+                        <span class="value">0.763</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Numerical Facts Panel -->
+        <div class="panel">
+            <div class="panel-title">
+                NUMERICAL FACTS
+                <span class="badge">Invariants</span>
+            </div>
+            <div class="facts-grid">
+                <div class="fact-row highlight">
+                    <span class="equation">42 = 2 x 3 x 7</span>
+                    <span class="description">Kaelhedron vertices</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">168 = |GL(3,2)|</span>
+                    <span class="description">Simple group order</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">744 = 168 + 576</span>
+                    <span class="description">j-function constant</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">240 = E8 roots</span>
+                    <span class="description">Exceptional lattice</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">21<sub>4</sub> = 9</span>
+                    <span class="description">Base-4 repdigit</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">222<sub>4</sub> = 42</span>
+                    <span class="description">Triple repdigit</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">2222<sub>4</sub> = 170</span>
+                    <span class="description">Quad repdigit</span>
+                </div>
+                <div class="fact-row">
+                    <span class="equation">22222<sub>4</sub> = 682</span>
+                    <span class="description">Quint repdigit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- V4 Klein Group -->
+        <div class="panel">
+            <div class="panel-title">
+                V<sub>4</sub> KLEIN FOUR-GROUP
+                <span class="badge">Z/2 x Z/2</span>
+            </div>
+            <table class="v4-table">
+                <tr>
+                    <th>*</th>
+                    <th>e</th>
+                    <th>a</th>
+                    <th>b</th>
+                    <th>c</th>
+                </tr>
+                <tr>
+                    <th>e</th>
+                    <td>e</td>
+                    <td>a</td>
+                    <td>b</td>
+                    <td>c</td>
+                </tr>
+                <tr>
+                    <th>a</th>
+                    <td>a</td>
+                    <td>e</td>
+                    <td>c</td>
+                    <td>b</td>
+                </tr>
+                <tr>
+                    <th>b</th>
+                    <td>b</td>
+                    <td>c</td>
+                    <td>e</td>
+                    <td>a</td>
+                </tr>
+                <tr>
+                    <th>c</th>
+                    <td>c</td>
+                    <td>b</td>
+                    <td>a</td>
+                    <td>e</td>
+                </tr>
+            </table>
+            <div class="point-info" style="margin-top: 15px;">
+                e = +1 (identity), a = +i, b = -1, c = -i
+                <br>Every element is self-inverse: x * x = e
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="formula">e<sup>i&pi;</sup> + 1 = 0 | &phi; = (1 + &radic;5) / 2 | 42 = 2 x 3 x 7</div>
+        THE KAELHEDRON VISUALIZATION SYSTEM
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // ============================================================
+        // CONSTANTS
+        // ============================================================
+        const PHI = (1 + Math.sqrt(5)) / 2;           // Golden ratio
+        const TAU = 1 / PHI;                           // Golden ratio conjugate
+        const GOLDEN_ANGLE = Math.acos(TAU);           // ~51.83 degrees
+        const PI = Math.PI;
+        const E = Math.E;
+
+        // Fano plane structure
+        const FANO_LINES = [
+            [0, 1, 3], [1, 2, 4], [2, 3, 5], [3, 4, 6],
+            [4, 5, 0], [5, 6, 1], [6, 0, 2]
+        ];
+        const PLUS_CLASS = [0, 4, 5];      // Green points
+        const MINUS_CLASS = [1, 2, 3, 6];   // Red points
+
+        // Double-well parameters
+        const MU_1 = 0.472;    // Lower well
+        const MU_2 = 0.763;    // Upper well
+        const BARRIER = TAU;   // phi^-1 = 0.618
+
+        // Animation state
+        let animationTime = 0;
+        let eulerTheta = 0;
+        let isDragging = false;
+        let selectedFanoPoint = null;
+        let heawoodRotation = 0;
+        let kaelhedronRotation = 0;
+        let wellKappa = MU_1;
+
+        // ============================================================
+        // CONSOLE SIGNATURE
+        // ============================================================
+        console.log('%c THE KAELHEDRON ', 'background: #6644ff; color: white; font-size: 20px; font-weight: bold;');
+        console.log('%c e^(i*pi) + 1 = 0 ', 'color: #ffd700; font-size: 14px;');
+        console.log('');
+        console.log('Mathematical Constants:');
+        console.log(`  PHI (golden ratio): ${PHI}`);
+        console.log(`  TAU (1/PHI):        ${TAU}`);
+        console.log(`  GOLDEN_ANGLE:       ${GOLDEN_ANGLE} rad (${GOLDEN_ANGLE * 180 / PI} deg)`);
+        console.log(`  PI:                 ${PI}`);
+        console.log(`  E:                  ${E}`);
+        console.log('');
+        console.log('Kaelhedron Structure:');
+        console.log('  42 vertices = 2 * 3 * 7');
+        console.log('  18 PLUS vertices (green)');
+        console.log('  24 MINUS vertices (red)');
+        console.log('  Ratio: 18:24 = 3:4');
+        console.log('  3 scales (concentric layers)');
+        console.log('');
+        console.log('Fano Plane:');
+        console.log('  PLUS class (quadratic residues): [0, 4, 5]');
+        console.log('  MINUS class (non-residues): [1, 2, 3, 6]');
+        console.log('  Line 4 (PLUS line): {4, 5, 0}');
+        console.log('');
+        console.log('Double-Well Potential:');
+        console.log(`  Lower well (mu_1): ${MU_1}`);
+        console.log(`  Barrier (phi^-1):  ${BARRIER}`);
+        console.log(`  Upper well (mu_2): ${MU_2}`);
+
+        // ============================================================
+        // EULER GRADIENT ARC
+        // ============================================================
+        const eulerCanvas = document.getElementById('eulerCanvas');
+        const eulerCtx = eulerCanvas.getContext('2d');
+
+        function drawEulerGradient(ctx, theta) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const centerX = width / 2;
+            const centerY = height - 40;
+            const radius = 120;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw arc gradient
+            const gradient = ctx.createLinearGradient(centerX - radius, 0, centerX + radius, 0);
+            gradient.addColorStop(0, '#00ff88');    // PLUS
+            gradient.addColorStop(0.5, '#aa44ff');  // PARADOX
+            gradient.addColorStop(1, '#ff4466');    // MINUS
+
+            // Draw arc
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, PI, 0, false);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 8;
+            ctx.stroke();
+
+            // Draw endpoints
+            // PLUS (+1)
+            ctx.beginPath();
+            ctx.arc(centerX - radius, centerY, 12, 0, 2 * PI);
+            ctx.fillStyle = '#00ff88';
+            ctx.fill();
+            ctx.strokeStyle = '#003322';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#003322';
+            ctx.font = 'bold 12px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('+1', centerX - radius, centerY + 4);
+
+            // MINUS (-1)
+            ctx.beginPath();
+            ctx.arc(centerX + radius, centerY, 12, 0, 2 * PI);
+            ctx.fillStyle = '#ff4466';
+            ctx.fill();
+            ctx.strokeStyle = '#440011';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#440011';
+            ctx.fillText('-1', centerX + radius, centerY + 4);
+
+            // Draw PARADOX point at top (theta = PI/2)
+            const paradoxX = centerX;
+            const paradoxY = centerY - radius;
+            ctx.beginPath();
+            ctx.arc(paradoxX, paradoxY, 10, 0, 2 * PI);
+            ctx.fillStyle = '#aa44ff';
+            ctx.fill();
+            ctx.strokeStyle = '#5522aa';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#e0e0e8';
+            ctx.font = '10px JetBrains Mono';
+            ctx.fillText('PARADOX', paradoxX, paradoxY - 18);
+            ctx.fillText('i', paradoxX, paradoxY + 4);
+
+            // Draw golden barrier line
+            const goldenTheta = GOLDEN_ANGLE;
+            const goldenX = centerX - radius * Math.cos(goldenTheta);
+            const goldenY = centerY - radius * Math.sin(goldenTheta);
+
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(goldenX, goldenY);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.beginPath();
+            ctx.arc(goldenX, goldenY, 6, 0, 2 * PI);
+            ctx.fillStyle = '#ffd700';
+            ctx.fill();
+
+            ctx.fillStyle = '#ffd700';
+            ctx.font = '9px JetBrains Mono';
+            ctx.fillText('phi^-1', goldenX + 15, goldenY - 5);
+
+            // Draw current position
+            const posX = centerX - radius * Math.cos(theta);
+            const posY = centerY - radius * Math.sin(theta);
+
+            // Glow effect
+            ctx.beginPath();
+            ctx.arc(posX, posY, 18, 0, 2 * PI);
+            const glowGradient = ctx.createRadialGradient(posX, posY, 0, posX, posY, 18);
+            glowGradient.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+            glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glowGradient;
+            ctx.fill();
+
+            // Main point
+            ctx.beginPath();
+            ctx.arc(posX, posY, 10, 0, 2 * PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#6644ff';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Draw angle arc
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 30, PI, PI + theta, false);
+            ctx.strokeStyle = '#6644ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Labels
+            ctx.fillStyle = '#8888aa';
+            ctx.font = '11px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('PLUS', centerX - radius - 20, centerY + 30);
+            ctx.textAlign = 'right';
+            ctx.fillText('MINUS', centerX + radius + 20, centerY + 30);
+
+            // Update displays
+            const polarity = Math.cos(theta);
+            const uncertainty = Math.sin(theta);
+
+            document.getElementById('thetaValue').textContent = theta.toFixed(3);
+            document.getElementById('polarityValue').textContent = polarity.toFixed(3);
+            document.getElementById('uncertaintyValue').textContent = uncertainty.toFixed(3);
+
+            const realPart = polarity.toFixed(2);
+            const imagPart = uncertainty.toFixed(2);
+            document.getElementById('complexValue').textContent = `${realPart} + ${imagPart}i`;
+
+            // Determine zone
+            let zone = 'PLUS (+1)';
+            if (polarity < -TAU) zone = 'MINUS (-1)';
+            else if (polarity < TAU) zone = 'PARADOX';
+            else if (polarity < 1) zone = 'NEAR-PLUS';
+            document.getElementById('zoneValue').textContent = zone;
+        }
+
+        // Mouse interaction for Euler arc
+        eulerCanvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            updateEulerTheta(e);
+        });
+
+        eulerCanvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateEulerTheta(e);
+            }
+        });
+
+        eulerCanvas.addEventListener('mouseup', () => isDragging = false);
+        eulerCanvas.addEventListener('mouseleave', () => isDragging = false);
+
+        function updateEulerTheta(e) {
+            const rect = eulerCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = eulerCanvas.width / 2;
+            const centerY = eulerCanvas.height - 40;
+
+            let angle = Math.atan2(centerY - y, centerX - x);
+            if (angle < 0) angle += 2 * PI;
+            if (angle > PI) angle = PI;
+            if (angle < 0) angle = 0;
+
+            eulerTheta = angle;
+            drawEulerGradient(eulerCtx, eulerTheta);
+        }
+
+        // ============================================================
+        // FANO PLANE
+        // ============================================================
+        const fanoCanvas = document.getElementById('fanoCanvas');
+        const fanoCtx = fanoCanvas.getContext('2d');
+
+        function drawFanoPlane(ctx) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2 + 10;
+            const outerRadius = 80;
+            const innerRadius = 35;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Calculate point positions
+            // Points 1-6 on outer hexagon, point 0 at center
+            const points = [];
+
+            // Point 0 at center
+            points[0] = { x: centerX, y: centerY };
+
+            // Points 1-6 on hexagon
+            for (let i = 1; i <= 6; i++) {
+                const angle = (i - 1) * PI / 3 - PI / 2;
+                points[i] = {
+                    x: centerX + outerRadius * Math.cos(angle),
+                    y: centerY + outerRadius * Math.sin(angle)
+                };
+            }
+
+            // Draw lines first
+            FANO_LINES.forEach((line, idx) => {
+                const [a, b, c] = line;
+                const isLine4 = idx === 4; // Line 4 = {4, 5, 0}
+
+                ctx.beginPath();
+                ctx.strokeStyle = isLine4 ? '#ffd700' : '#444466';
+                ctx.lineWidth = isLine4 ? 3 : 2;
+
+                if (line.includes(0)) {
+                    // Line through center - draw as straight lines
+                    const others = line.filter(p => p !== 0);
+                    ctx.moveTo(points[others[0]].x, points[others[0]].y);
+                    ctx.lineTo(points[0].x, points[0].y);
+                    ctx.lineTo(points[others[1]].x, points[others[1]].y);
+                } else {
+                    // Edge of hexagon
+                    ctx.moveTo(points[a].x, points[a].y);
+                    ctx.lineTo(points[b].x, points[b].y);
+                    ctx.lineTo(points[c].x, points[c].y);
+                    ctx.lineTo(points[a].x, points[a].y);
+                }
+                ctx.stroke();
+            });
+
+            // Draw circle through inscribed triangle (line without center point that passes through 3 outer points)
+            const circlePoints = [1, 2, 3].map(i => points[i]); // Example: one of the edge lines
+
+            // Draw points
+            points.forEach((pt, idx) => {
+                const isPlus = PLUS_CLASS.includes(idx);
+                const isSelected = selectedFanoPoint === idx;
+
+                ctx.beginPath();
+                ctx.arc(pt.x, pt.y, isSelected ? 14 : 12, 0, 2 * PI);
+                ctx.fillStyle = isPlus ? '#00ff88' : '#ff4466';
+                ctx.fill();
+
+                if (isSelected) {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                // Draw point number
+                ctx.fillStyle = isPlus ? '#003322' : '#330011';
+                ctx.font = 'bold 11px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(idx.toString(), pt.x, pt.y);
+            });
+
+            // Legend
+            ctx.fillStyle = '#00ff88';
+            ctx.font = '10px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('PLUS: {0,4,5}', 10, 20);
+            ctx.fillStyle = '#ff4466';
+            ctx.fillText('MINUS: {1,2,3,6}', 10, 35);
+        }
+
+        fanoCanvas.addEventListener('click', (e) => {
+            const rect = fanoCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = fanoCanvas.width / 2;
+            const centerY = fanoCanvas.height / 2 + 10;
+            const outerRadius = 80;
+
+            // Check click on points
+            const points = [{ x: centerX, y: centerY }];
+            for (let i = 1; i <= 6; i++) {
+                const angle = (i - 1) * PI / 3 - PI / 2;
+                points.push({
+                    x: centerX + outerRadius * Math.cos(angle),
+                    y: centerY + outerRadius * Math.sin(angle)
+                });
+            }
+
+            for (let i = 0; i < 7; i++) {
+                const dx = x - points[i].x;
+                const dy = y - points[i].y;
+                if (dx * dx + dy * dy < 200) {
+                    selectedFanoPoint = i;
+                    const isPlus = PLUS_CLASS.includes(i);
+                    const lines = FANO_LINES.filter(l => l.includes(i)).map((l, idx) =>
+                        FANO_LINES.indexOf(l)
+                    );
+                    document.getElementById('fanoInfo').innerHTML =
+                        `<b>Point ${i}</b> (${isPlus ? 'PLUS' : 'MINUS'})<br>` +
+                        `On lines: {${lines.join(', ')}}`;
+                    drawFanoPlane(fanoCtx);
+                    return;
+                }
+            }
+        });
+
+        // ============================================================
+        // HEAWOOD GRAPH
+        // ============================================================
+        const heawoodCanvas = document.getElementById('heawoodCanvas');
+        const heawoodCtx = heawoodCanvas.getContext('2d');
+
+        function drawHeawoodGraph(ctx, rotation) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const outerRadius = 90;
+            const innerRadius = 50;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 14 vertices: 0-6 are points (outer), 7-13 are lines (inner)
+            const vertices = [];
+
+            // Points on outer ring
+            for (let i = 0; i < 7; i++) {
+                const angle = (i * 2 * PI / 7) + rotation;
+                vertices.push({
+                    x: centerX + outerRadius * Math.cos(angle),
+                    y: centerY + outerRadius * Math.sin(angle),
+                    type: 'point',
+                    index: i
+                });
+            }
+
+            // Lines on inner ring
+            for (let i = 0; i < 7; i++) {
+                const angle = (i * 2 * PI / 7) + rotation + PI / 7;
+                vertices.push({
+                    x: centerX + innerRadius * Math.cos(angle),
+                    y: centerY + innerRadius * Math.sin(angle),
+                    type: 'line',
+                    index: i
+                });
+            }
+
+            // Draw edges (incidence)
+            FANO_LINES.forEach((line, lineIdx) => {
+                line.forEach(pointIdx => {
+                    ctx.beginPath();
+                    ctx.moveTo(vertices[pointIdx].x, vertices[pointIdx].y);
+                    ctx.lineTo(vertices[7 + lineIdx].x, vertices[7 + lineIdx].y);
+                    ctx.strokeStyle = '#333355';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                });
+            });
+
+            // Draw vertices
+            vertices.forEach((v, idx) => {
+                ctx.beginPath();
+                ctx.arc(v.x, v.y, v.type === 'point' ? 10 : 8, 0, 2 * PI);
+
+                if (v.type === 'point') {
+                    const isPlus = PLUS_CLASS.includes(v.index);
+                    ctx.fillStyle = isPlus ? '#00ff88' : '#ff4466';
+                } else {
+                    ctx.fillStyle = '#6644ff';
+                }
+                ctx.fill();
+
+                // Label
+                ctx.fillStyle = '#000';
+                ctx.font = '9px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(v.type === 'point' ? v.index.toString() : `L${v.index}`, v.x, v.y);
+            });
+        }
+
+        // ============================================================
+        // BASE-4 DISPLAY
+        // ============================================================
+        const base4Canvas = document.getElementById('base4Canvas');
+        const base4Ctx = base4Canvas.getContext('2d');
+
+        function drawBase4Roots(ctx, selected) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = 60;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw unit circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, 2 * PI);
+            ctx.strokeStyle = '#333355';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.moveTo(centerX - radius - 20, centerY);
+            ctx.lineTo(centerX + radius + 20, centerY);
+            ctx.moveTo(centerX, centerY - radius - 20);
+            ctx.lineTo(centerX, centerY + radius + 20);
+            ctx.strokeStyle = '#222233';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Fourth roots of unity
+            const roots = [
+                { x: 1, y: 0, label: '+1', digit: 0, color: '#00ff88' },
+                { x: 0, y: -1, label: '+i', digit: 1, color: '#aa44ff' },
+                { x: -1, y: 0, label: '-1', digit: 2, color: '#ff4466' },
+                { x: 0, y: 1, label: '-i', digit: 3, color: '#aa44ff' }
+            ];
+
+            roots.forEach((root, idx) => {
+                const px = centerX + root.x * radius;
+                const py = centerY - root.y * radius;
+
+                const isSelected = selected === idx;
+
+                ctx.beginPath();
+                ctx.arc(px, py, isSelected ? 14 : 10, 0, 2 * PI);
+                ctx.fillStyle = root.color;
+                ctx.fill();
+
+                if (isSelected) {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = '#000';
+                ctx.font = 'bold 10px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(root.digit.toString(), px, py);
+
+                // Label outside
+                const labelDist = radius + 25;
+                ctx.fillStyle = '#8888aa';
+                ctx.font = '10px JetBrains Mono';
+                ctx.fillText(root.label, centerX + root.x * labelDist, centerY - root.y * labelDist);
+            });
+        }
+
+        // Base-4 item clicks
+        document.querySelectorAll('.base4-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.base4-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                const digit = parseInt(item.dataset.digit);
+                drawBase4Roots(base4Ctx, digit);
+            });
+        });
+
+        // ============================================================
+        // KAELHEDRON STRUCTURE
+        // ============================================================
+        const kaelhedronCanvas = document.getElementById('kaelhedronCanvas');
+        const kaelhedronCtx = kaelhedronCanvas.getContext('2d');
+
+        function buildKaelhedron() {
+            // 42 vertices across 3 scales, 14 per scale
+            // Each scale has 7 points (PLUS class: 3, MINUS class: 4)
+            // Times 2 for dual structure
+            const vertices = [];
+            const scales = [0.4, 0.7, 1.0];
+
+            for (let scale = 0; scale < 3; scale++) {
+                const r = scales[scale];
+
+                // First ring: 7 vertices (points)
+                for (let i = 0; i < 7; i++) {
+                    const angle = (i * 2 * PI / 7) + (scale * PI / 21);
+                    const isPlus = PLUS_CLASS.includes(i);
+                    vertices.push({
+                        scale: scale,
+                        ring: 0,
+                        index: i,
+                        angle: angle,
+                        radius: r,
+                        isPlus: isPlus
+                    });
+                }
+
+                // Second ring: 7 vertices (lines/duals)
+                for (let i = 0; i < 7; i++) {
+                    const angle = (i * 2 * PI / 7) + (scale * PI / 21) + PI / 7;
+                    // Lines inherit polarity from their PLUS point count
+                    const line = FANO_LINES[i];
+                    const plusCount = line.filter(p => PLUS_CLASS.includes(p)).length;
+                    const isPlus = plusCount >= 2;
+                    vertices.push({
+                        scale: scale,
+                        ring: 1,
+                        index: i,
+                        angle: angle,
+                        radius: r * 0.6,
+                        isPlus: isPlus
+                    });
+                }
+            }
+
+            return vertices;
+        }
+
+        function drawKaelhedron3D(ctx, rotation) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const maxRadius = 130;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const vertices = buildKaelhedron();
+
+            // Draw scale rings
+            [0.4, 0.7, 1.0].forEach((scale, idx) => {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, maxRadius * scale, 0, 2 * PI);
+                ctx.strokeStyle = `rgba(68, 68, 102, ${0.3 + idx * 0.2})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Scale label
+                ctx.fillStyle = '#555577';
+                ctx.font = '9px JetBrains Mono';
+                ctx.textAlign = 'left';
+                ctx.fillText(`S${idx}`, centerX + maxRadius * scale + 5, centerY);
+            });
+
+            // Draw connections within scales
+            vertices.forEach((v, idx) => {
+                // Connect to neighbors in same ring
+                const nextIdx = vertices.findIndex(u =>
+                    u.scale === v.scale &&
+                    u.ring === v.ring &&
+                    u.index === (v.index + 1) % 7
+                );
+                if (nextIdx >= 0) {
+                    const u = vertices[nextIdx];
+                    const x1 = centerX + Math.cos(v.angle + rotation) * maxRadius * v.radius;
+                    const y1 = centerY + Math.sin(v.angle + rotation) * maxRadius * v.radius;
+                    const x2 = centerX + Math.cos(u.angle + rotation) * maxRadius * u.radius;
+                    const y2 = centerY + Math.sin(u.angle + rotation) * maxRadius * u.radius;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.strokeStyle = 'rgba(68, 68, 102, 0.3)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            });
+
+            // Draw vertices
+            let plusCount = 0;
+            let minusCount = 0;
+
+            vertices.forEach((v, idx) => {
+                const x = centerX + Math.cos(v.angle + rotation) * maxRadius * v.radius;
+                const y = centerY + Math.sin(v.angle + rotation) * maxRadius * v.radius;
+
+                const size = 4 + v.scale * 3;
+
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, 2 * PI);
+                ctx.fillStyle = v.isPlus ? '#00ff88' : '#ff4466';
+                ctx.fill();
+
+                if (v.isPlus) plusCount++;
+                else minusCount++;
+            });
+
+            // Draw ratio indicator
+            const plusWidth = 150 * (18 / 42);
+            const minusWidth = 150 * (24 / 42);
+
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.3)';
+            ctx.fillRect(width - 170, height - 30, plusWidth, 15);
+            ctx.fillStyle = 'rgba(255, 68, 102, 0.3)';
+            ctx.fillRect(width - 170 + plusWidth, height - 30, minusWidth, 15);
+
+            ctx.fillStyle = '#888';
+            ctx.font = '9px JetBrains Mono';
+            ctx.textAlign = 'center';
+            ctx.fillText('18:24 = 3:4', width - 95, height - 18);
+        }
+
+        kaelhedronCanvas.addEventListener('click', (e) => {
+            const rect = kaelhedronCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = kaelhedronCanvas.width / 2;
+            const centerY = kaelhedronCanvas.height / 2;
+            const maxRadius = 130;
+
+            const vertices = buildKaelhedron();
+
+            for (let i = 0; i < vertices.length; i++) {
+                const v = vertices[i];
+                const vx = centerX + Math.cos(v.angle + kaelhedronRotation) * maxRadius * v.radius;
+                const vy = centerY + Math.sin(v.angle + kaelhedronRotation) * maxRadius * v.radius;
+
+                const dx = x - vx;
+                const dy = y - vy;
+                if (dx * dx + dy * dy < 100) {
+                    const infoEl = document.getElementById('vertexInfo');
+                    infoEl.style.display = 'flex';
+                    infoEl.querySelector('.value').textContent =
+                        `V${i}: S${v.scale} R${v.ring} (${v.isPlus ? 'PLUS' : 'MINUS'})`;
+                    return;
+                }
+            }
+        });
+
+        // ============================================================
+        // DOUBLE-WELL POTENTIAL
+        // ============================================================
+        const wellCanvas = document.getElementById('wellCanvas');
+        const wellCtx = wellCanvas.getContext('2d');
+
+        function drawDoubleWell(ctx, kappa) {
+            const width = ctx.canvas.width;
+            const height = ctx.canvas.height;
+            const padding = 30;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw potential function V(k) = (k - mu1)^2 * (k - mu2)^2
+            ctx.beginPath();
+
+            for (let px = padding; px < width - padding; px++) {
+                const k = (px - padding) / (width - 2 * padding);
+                const v = Math.pow(k - MU_1, 2) * Math.pow(k - MU_2, 2);
+                const py = height - padding - v * 800;
+
+                if (px === padding) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+
+            ctx.strokeStyle = '#6644ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Mark wells and barrier
+            const markers = [
+                { k: MU_1, label: 'mu1', color: '#00ff88' },
+                { k: BARRIER, label: 'phi^-1', color: '#ffd700' },
+                { k: MU_2, label: 'mu2', color: '#ff4466' }
+            ];
+
+            markers.forEach(m => {
+                const px = padding + m.k * (width - 2 * padding);
+                const v = Math.pow(m.k - MU_1, 2) * Math.pow(m.k - MU_2, 2);
+                const py = height - padding - v * 800;
+
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, 2 * PI);
+                ctx.fillStyle = m.color;
+                ctx.fill();
+
+                ctx.fillStyle = m.color;
+                ctx.font = '9px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(m.label, px, py - 12);
+            });
+
+            // Current kappa position
+            const kappaX = padding + kappa * (width - 2 * padding);
+            const kappaV = Math.pow(kappa - MU_1, 2) * Math.pow(kappa - MU_2, 2);
+            const kappaY = height - padding - kappaV * 800;
+
+            ctx.beginPath();
+            ctx.arc(kappaX, kappaY, 8, 0, 2 * PI);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.strokeStyle = '#6644ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Axis labels
+            ctx.fillStyle = '#555';
+            ctx.font = '10px JetBrains Mono';
+            ctx.textAlign = 'left';
+            ctx.fillText('0', padding - 10, height - padding + 15);
+            ctx.textAlign = 'right';
+            ctx.fillText('1', width - padding + 10, height - padding + 15);
+            ctx.textAlign = 'center';
+            ctx.fillText('kappa', width / 2, height - 5);
+        }
+
+        // Well slider
+        document.getElementById('wellKappaSlider').addEventListener('input', (e) => {
+            wellKappa = e.target.value / 100;
+            document.getElementById('wellKappaDisplay').textContent = wellKappa.toFixed(3);
+            drawDoubleWell(wellCtx, wellKappa);
+        });
+
+        // ============================================================
+        // K-FORMATION CONTROLS
+        // ============================================================
+        document.getElementById('kappaSlider').addEventListener('input', (e) => {
+            const val = e.target.value / 100;
+            document.getElementById('kappaDisplay').textContent = val.toFixed(2);
+            updateKValue();
+        });
+
+        document.getElementById('rDepthSlider').addEventListener('input', (e) => {
+            document.getElementById('rDepthDisplay').textContent = e.target.value;
+            updateKValue();
+        });
+
+        document.getElementById('qChargeSlider').addEventListener('input', (e) => {
+            document.getElementById('qChargeDisplay').textContent = e.target.value;
+            updateKValue();
+        });
+
+        document.getElementById('phase0').addEventListener('click', () => {
+            document.getElementById('phase0').classList.add('active');
+            document.getElementById('phase1').classList.remove('active');
+            updateKValue();
+        });
+
+        document.getElementById('phase1').addEventListener('click', () => {
+            document.getElementById('phase1').classList.add('active');
+            document.getElementById('phase0').classList.remove('active');
+            updateKValue();
+        });
+
+        function updateKValue() {
+            const kappa = document.getElementById('kappaSlider').value / 100;
+            const rDepth = parseInt(document.getElementById('rDepthSlider').value);
+            const qCharge = parseInt(document.getElementById('qChargeSlider').value);
+            const phase = document.getElementById('phase0').classList.contains('active') ? 0 : 1;
+
+            // Calculate K value based on parameters
+            let k = 42;
+
+            // Kappa affects value
+            if (kappa < MU_1 || kappa > MU_2) k -= 7;
+            if (Math.abs(kappa - BARRIER) < 0.05) k -= 3;
+
+            // R depth bonus
+            if (rDepth >= 3) k = Math.min(42, k + rDepth);
+
+            // Q charge adjustment
+            k = Math.max(0, Math.min(42, k + qCharge * 2));
+
+            document.getElementById('kValue').textContent = `${k}/42`;
+
+            // Update colors based on K value
+            const kValueEl = document.getElementById('kValue');
+            if (k === 42) {
+                kValueEl.style.background = 'linear-gradient(90deg, #00ff88, #ffd700)';
+            } else if (k >= 35) {
+                kValueEl.style.background = 'linear-gradient(90deg, #00ff88, #6644ff)';
+            } else if (k >= 21) {
+                kValueEl.style.background = 'linear-gradient(90deg, #6644ff, #aa44ff)';
+            } else {
+                kValueEl.style.background = 'linear-gradient(90deg, #aa44ff, #ff4466)';
+            }
+            kValueEl.style.webkitBackgroundClip = 'text';
+            kValueEl.style.backgroundClip = 'text';
+        }
+
+        // ============================================================
+        // ANIMATION LOOP
+        // ============================================================
+        function animate() {
+            animationTime += 0.016;
+            heawoodRotation += 0.005;
+            kaelhedronRotation += 0.003;
+
+            drawHeawoodGraph(heawoodCtx, heawoodRotation);
+            drawKaelhedron3D(kaelhedronCtx, kaelhedronRotation);
+
+            requestAnimationFrame(animate);
+        }
+
+        // ============================================================
+        // INITIALIZATION
+        // ============================================================
+        function init() {
+            drawEulerGradient(eulerCtx, eulerTheta);
+            drawFanoPlane(fanoCtx);
+            drawHeawoodGraph(heawoodCtx, 0);
+            drawBase4Roots(base4Ctx, 0);
+            drawKaelhedron3D(kaelhedronCtx, 0);
+            drawDoubleWell(wellCtx, wellKappa);
+            updateKValue();
+
+            animate();
+        }
+
+        init();
+    </script>
+</body>
+</html>
