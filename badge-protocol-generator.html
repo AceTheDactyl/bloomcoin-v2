@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Badge Protocol Generator v1.0 | BloomCoin LSB Badges</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #040408;
+            --bg-panel: #0a0a12;
+            --bg-card: #0d0d18;
+            --bg-input: #050508;
+            --accent-gold: #d4af37;
+            --accent-cyan: #4cc9f0;
+            --accent-green: #50a878;
+            --accent-magenta: #f72585;
+            --accent-violet: #7b2cbf;
+            --accent-orange: #ff8228;
+            --text-main: #e8e0d5;
+            --text-muted: #707080;
+            --border-subtle: #1a1a2a;
+            --mono: 'JetBrains Mono', monospace;
+            --tech: 'Orbitron', sans-serif;
+            --display: 'Cinzel', serif;
+            --radius: 8px;
+
+            /* Territory Colors */
+            --garden: #50a878;
+            --cosmic: #ffd700;
+            --abyss: #9070a8;
+            --unified: #c09050;
+
+            /* Badge Category Colors */
+            --cat-guardian: #4cc9f0;
+            --cat-handler: #5a9a8a;
+            --cat-light: #a0a8b8;
+            --cat-helix: #4cc9f0;
+            --cat-apl: #f72585;
+            --cat-neural: #00d9ff;
+            --cat-metastate: #ff6b6b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--mono);
+            background: radial-gradient(ellipse at 30% 20%, rgba(212,175,55,0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(80,168,120,0.03) 0%, transparent 50%),
+                        var(--bg-void);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(212,175,55,0.08) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 20px rgba(212,175,55,0.3);
+        }
+
+        .logo-text h1 {
+            font-family: var(--tech);
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text .version {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--accent-gold);
+            background: rgba(212,175,55,0.1);
+            color: var(--accent-gold);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: rgba(212,175,55,0.2);
+            box-shadow: 0 0 15px rgba(212,175,55,0.3);
+        }
+
+        .btn.primary { background: var(--accent-gold); color: var(--bg-void); }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+        }
+
+        @media (max-width: 1000px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .panel-title {
+            font-family: var(--tech);
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            letter-spacing: 0.05em;
+        }
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.5rem 0.6rem;
+            color: var(--text-main);
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+        }
+
+        textarea { resize: vertical; min-height: 60px; }
+
+        /* Territory Selector */
+        .territory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.4rem;
+        }
+
+        .territory-btn {
+            padding: 0.5rem 0.3rem;
+            border: 2px solid var(--border-subtle);
+            background: var(--bg-input);
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .territory-btn:hover { transform: translateY(-2px); }
+        .territory-btn.active { border-width: 2px; }
+
+        .territory-btn.garden { border-color: var(--garden); }
+        .territory-btn.garden.active { background: rgba(80,168,120,0.2); box-shadow: 0 0 15px rgba(80,168,120,0.3); }
+        .territory-btn.cosmic { border-color: var(--cosmic); }
+        .territory-btn.cosmic.active { background: rgba(255,215,0,0.15); box-shadow: 0 0 15px rgba(255,215,0,0.3); }
+        .territory-btn.abyss { border-color: var(--abyss); }
+        .territory-btn.abyss.active { background: rgba(144,112,168,0.2); box-shadow: 0 0 15px rgba(144,112,168,0.3); }
+        .territory-btn.unified { border-color: var(--unified); }
+        .territory-btn.unified.active { background: rgba(192,144,80,0.15); box-shadow: 0 0 15px rgba(192,144,80,0.3); }
+
+        .territory-btn .icon { font-size: 1.2rem; }
+        .territory-btn .name { font-size: 0.6rem; margin-top: 0.2rem; }
+
+        /* Badge Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+        }
+
+        .category-btn {
+            padding: 0.4rem;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-input);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .category-btn:hover { border-color: currentColor; background: rgba(255,255,255,0.05); }
+        .category-btn.active { border-color: currentColor; background: rgba(255,255,255,0.1); }
+
+        .category-btn[data-cat="guardian"] { color: var(--cat-guardian); }
+        .category-btn[data-cat="handler"] { color: var(--cat-handler); }
+        .category-btn[data-cat="light"] { color: var(--cat-light); }
+        .category-btn[data-cat="helix"] { color: var(--cat-helix); }
+        .category-btn[data-cat="apl"] { color: var(--cat-apl); }
+        .category-btn[data-cat="neural"] { color: var(--cat-neural); }
+        .category-btn[data-cat="metastate"] { color: var(--cat-metastate); }
+        .category-btn[data-cat="colorwheel"] {
+            background: linear-gradient(135deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+            color: #000;
+            font-weight: 700;
+        }
+
+        /* Badge Preview */
+        .badge-preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .badge-canvas-wrap {
+            position: relative;
+            padding: 1rem;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .badge-canvas {
+            border-radius: 50%;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.5), 0 0 50px rgba(212,175,55,0.2);
+        }
+
+        .badge-info {
+            text-align: center;
+        }
+
+        .badge-name {
+            font-family: var(--display);
+            font-size: 1.3rem;
+            color: var(--accent-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .badge-territory {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .badge-territory.garden { color: var(--garden); }
+        .badge-territory.cosmic { color: var(--cosmic); }
+        .badge-territory.abyss { color: var(--abyss); }
+        .badge-territory.unified { color: var(--unified); }
+
+        /* Guardian Selector */
+        .guardian-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.4rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .guardian-option {
+            padding: 0.5rem;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-input);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .guardian-option:hover { border-color: var(--accent-gold); }
+        .guardian-option.selected { border-color: var(--accent-gold); background: rgba(212,175,55,0.1); }
+
+        .guardian-option .icon { font-size: 1.1rem; }
+        .guardian-option .info { flex: 1; min-width: 0; }
+        .guardian-option .name { font-size: 0.7rem; font-weight: 600; }
+        .guardian-option .role { font-size: 0.55rem; color: var(--text-muted); }
+
+        /* Action Buttons */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.6rem;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.7rem;
+        }
+
+        .action-btn:hover { border-color: var(--accent-cyan); background: rgba(76,201,240,0.1); }
+        .action-btn.primary { border-color: var(--accent-gold); background: var(--accent-gold); color: var(--bg-void); }
+
+        /* Protocol Output */
+        .protocol-output {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-size: 0.7rem;
+            max-height: 200px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Badge Library */
+        .badge-library {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 0.25rem;
+        }
+
+        .library-badge {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 2px solid var(--border-subtle);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .library-badge:hover {
+            transform: scale(1.1);
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(212,175,55,0.4);
+        }
+
+        .library-badge canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
+        .library-badge .badge-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            padding: 0.15rem;
+            font-size: 0.5rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* LSB Indicator */
+        .lsb-indicator {
+            display: flex;
+            gap: 0.3rem;
+            align-items: center;
+            padding: 0.4rem;
+            background: var(--bg-input);
+            border-radius: 4px;
+            font-size: 0.65rem;
+        }
+
+        .lsb-bit {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: var(--border-subtle);
+        }
+
+        .lsb-bit.active { background: var(--accent-cyan); box-shadow: 0 0 5px var(--accent-cyan); }
+        .lsb-bit.r { background: #ff6b6b; }
+        .lsb-bit.g { background: #51cf66; }
+        .lsb-bit.b { background: #339af0; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            padding: 0.75rem 1rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--accent-green);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">B</div>
+            <div class="logo-text">
+                <h1>BADGE PROTOCOL GENERATOR</h1>
+                <div class="version">BloomCoin LSB Badge System v1.0</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="lsb-png-generator.html" class="btn">LSB Generator</a>
+            <a href="generator-hub.html" class="btn">Hub</a>
+            <button class="btn primary" id="exportAllBtn">Export All</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Panel: Badge Builder -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">BADGE BUILDER</span>
+            </div>
+
+            <!-- Territory Selection -->
+            <div class="section">
+                <div class="section-title">Territory</div>
+                <div class="territory-grid">
+                    <div class="territory-btn garden active" data-territory="garden">
+                        <div class="icon">G</div>
+                        <div class="name">Garden</div>
+                    </div>
+                    <div class="territory-btn cosmic" data-territory="cosmic">
+                        <div class="icon">C</div>
+                        <div class="name">Cosmic</div>
+                    </div>
+                    <div class="territory-btn abyss" data-territory="abyss">
+                        <div class="icon">A</div>
+                        <div class="name">Abyss</div>
+                    </div>
+                    <div class="territory-btn unified" data-territory="unified">
+                        <div class="icon">U</div>
+                        <div class="name">Unified</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Selection -->
+            <div class="section">
+                <div class="section-title">Badge Category</div>
+                <div class="category-grid">
+                    <div class="category-btn active" data-cat="guardian">Guardian</div>
+                    <div class="category-btn" data-cat="handler">Handler</div>
+                    <div class="category-btn" data-cat="light">Light</div>
+                    <div class="category-btn" data-cat="helix">Helix</div>
+                    <div class="category-btn" data-cat="apl">APL</div>
+                    <div class="category-btn" data-cat="neural">Neural</div>
+                    <div class="category-btn" data-cat="metastate">Metastate</div>
+                    <div class="category-btn" data-cat="colorwheel">Wheel</div>
+                </div>
+            </div>
+
+            <!-- Guardian Selection -->
+            <div class="section" id="guardianSection">
+                <div class="section-title">Select Guardian</div>
+                <div class="guardian-grid" id="guardianGrid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Badge Details -->
+            <div class="section">
+                <div class="section-title">Badge Details</div>
+                <label>Badge Name</label>
+                <input type="text" id="badgeName" value="Bloom Guardian">
+
+                <label style="margin-top: 0.5rem;">Protocol Payload</label>
+                <textarea id="protocolPayload" placeholder="Custom protocol data..."></textarea>
+
+                <label style="margin-top: 0.5rem;">Lattice Position</label>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem;">
+                    <input type="number" id="lat_a" value="0" min="-20" max="20" placeholder="a">
+                    <input type="number" id="lat_b" value="0" min="-20" max="20" placeholder="b">
+                    <input type="number" id="lat_c" value="0" min="-20" max="20" placeholder="c">
+                    <input type="number" id="lat_d" value="0" min="-20" max="20" placeholder="d">
+                    <input type="number" id="lat_f" value="0" min="-20" max="20" placeholder="f">
+                </div>
+            </div>
+
+            <!-- LSB Settings -->
+            <div class="section">
+                <div class="section-title">LSB Encoding</div>
+                <div class="lsb-indicator">
+                    <span>Channels:</span>
+                    <div class="lsb-bit r active"></div>
+                    <div class="lsb-bit g active"></div>
+                    <div class="lsb-bit b active"></div>
+                    <span style="margin-left: 0.5rem;">Depth: 2-bit</span>
+                </div>
+                <select id="lsbDepth" style="margin-top: 0.4rem;">
+                    <option value="1">1-bit LSB</option>
+                    <option value="2" selected>2-bit LSB</option>
+                    <option value="3">3-bit LSB</option>
+                </select>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-grid">
+                <button class="action-btn primary" id="generateBadgeBtn">Generate Badge</button>
+                <button class="action-btn" id="randomizeBtn">Randomize</button>
+                <button class="action-btn" id="saveCacheBtn">Save to Cache</button>
+                <button class="action-btn" id="downloadBtn">Download PNG</button>
+            </div>
+        </div>
+
+        <!-- Right Panel: Preview & Library -->
+        <div class="panel" style="flex: 1;">
+            <div class="panel-header">
+                <span class="panel-title">BADGE PREVIEW</span>
+            </div>
+
+            <div class="badge-preview-container">
+                <div class="badge-canvas-wrap">
+                    <canvas id="badgeCanvas" class="badge-canvas" width="256" height="256"></canvas>
+                </div>
+                <div class="badge-info">
+                    <div class="badge-name" id="previewName">Bloom Guardian</div>
+                    <div class="badge-territory garden" id="previewTerritory">GARDEN TERRITORY</div>
+                </div>
+            </div>
+
+            <!-- Protocol Output -->
+            <div class="section">
+                <div class="section-title">Encoded Protocol</div>
+                <div class="protocol-output" id="protocolOutput">
+{
+  "protocol": "bloom:badge:v1",
+  "territory": "garden",
+  "category": "guardian",
+  "guardian": "Bloom Keeper",
+  "lattice": [0, 0, 0, 0, 0],
+  "timestamp": 0,
+  "signature": "..."
+}
+                </div>
+            </div>
+
+            <!-- Badge Library -->
+            <div class="section">
+                <div class="section-title">Badge Library (Cached)</div>
+                <div class="badge-library" id="badgeLibrary">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+    // ============================================================================
+    // BloomCoin Badge Protocol Generator
+    // ============================================================================
+
+    const PHI = 1.6180339887498949;
+    const PI = Math.PI;
+    const L4 = 7;
+    const MRP_MAGIC = [0x4C, 0x34]; // "L4"
+
+    // Territory configurations
+    const TERRITORIES = {
+        garden: {
+            name: 'Garden',
+            color: '#50a878',
+            gradient: ['#50a878', '#2d5a42', '#1a3328'],
+            guardians: [
+                { id: 'bloom_keeper', name: 'Bloom Keeper', icon: 'BK', role: 'Growth Guardian' },
+                { id: 'root_tender', name: 'Root Tender', icon: 'RT', role: 'Foundation Guide' },
+                { id: 'vine_weaver', name: 'Vine Weaver', icon: 'VW', role: 'Connection Maker' },
+                { id: 'leaf_singer', name: 'Leaf Singer', icon: 'LS', role: 'Harmony Keeper' },
+                { id: 'petal_dancer', name: 'Petal Dancer', icon: 'PD', role: 'Expression Agent' },
+                { id: 'seed_holder', name: 'Seed Holder', icon: 'SH', role: 'Potential Guardian' }
+            ]
+        },
+        cosmic: {
+            name: 'Cosmic',
+            color: '#ffd700',
+            gradient: ['#ffd700', '#c9a227', '#8b7014'],
+            guardians: [
+                { id: 'star_weaver', name: 'Star Weaver', icon: 'SW', role: 'Pattern Maker' },
+                { id: 'void_walker', name: 'Void Walker', icon: 'VW', role: 'Space Navigator' },
+                { id: 'light_bearer', name: 'Light Bearer', icon: 'LB', role: 'Illuminator' },
+                { id: 'time_keeper', name: 'Time Keeper', icon: 'TK', role: 'Temporal Guide' },
+                { id: 'nova_spark', name: 'Nova Spark', icon: 'NS', role: 'Energy Source' },
+                { id: 'orbit_dancer', name: 'Orbit Dancer', icon: 'OD', role: 'Cycle Guardian' }
+            ]
+        },
+        abyss: {
+            name: 'Abyss',
+            color: '#9070a8',
+            gradient: ['#9070a8', '#5c4570', '#3a2848'],
+            guardians: [
+                { id: 'shadow_keeper', name: 'Shadow Keeper', icon: 'SK', role: 'Mystery Guardian' },
+                { id: 'depth_walker', name: 'Depth Walker', icon: 'DW', role: 'Deep Explorer' },
+                { id: 'echo_listener', name: 'Echo Listener', icon: 'EL', role: 'Signal Finder' },
+                { id: 'veil_weaver', name: 'Veil Weaver', icon: 'VW', role: 'Boundary Keeper' },
+                { id: 'silence_holder', name: 'Silence Holder', icon: 'SH', role: 'Pause Guardian' },
+                { id: 'dream_tender', name: 'Dream Tender', icon: 'DT', role: 'Vision Guide' }
+            ]
+        },
+        unified: {
+            name: 'Unified',
+            color: '#c09050',
+            gradient: ['#c09050', '#8b6538', '#5a4024'],
+            guardians: [
+                { id: 'bridge_builder', name: 'Bridge Builder', icon: 'BB', role: 'Unity Maker' },
+                { id: 'harmony_keeper', name: 'Harmony Keeper', icon: 'HK', role: 'Balance Guide' },
+                { id: 'synthesis_weaver', name: 'Synthesis Weaver', icon: 'SW', role: 'Integration Agent' },
+                { id: 'cycle_guardian', name: 'Cycle Guardian', icon: 'CG', role: 'Renewal Keeper' },
+                { id: 'path_finder', name: 'Path Finder', icon: 'PF', role: 'Way Opener' },
+                { id: 'anchor_holder', name: 'Anchor Holder', icon: 'AH', role: 'Stability Source' }
+            ]
+        }
+    };
+
+    // State
+    let currentTerritory = 'garden';
+    let currentCategory = 'guardian';
+    let selectedGuardian = null;
+    let cachedBadges = [];
+
+    // Canvas and context
+    const canvas = document.getElementById('badgeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // ============================================================================
+    // LSB Encoder
+    // ============================================================================
+
+    class BadgeLSBEncoder {
+        constructor(ctx) {
+            this.ctx = ctx;
+        }
+
+        getLSB(value, nBits = 1) {
+            return value & ((1 << nBits) - 1);
+        }
+
+        setLSB(value, payload, nBits = 1) {
+            const mask = (1 << nBits) - 1;
+            return (value & ~mask) | (payload & mask);
+        }
+
+        goldenScatter(bitIndex, totalPixels) {
+            return Math.floor(bitIndex * PHI * totalPixels / 8) % totalPixels;
+        }
+
+        encode(imageData, payload, lsbDepth = 2) {
+            const pixels = imageData.data;
+            const totalPixels = imageData.width * imageData.height;
+
+            // Prepare payload with header
+            const payloadBytes = this.preparePayload(payload);
+            const payloadBits = this.bytesToBits(payloadBytes);
+
+            // Embed using golden scatter
+            for (let i = 0; i < payloadBits.length; i++) {
+                const pixelIndex = this.goldenScatter(i, totalPixels);
+                const channelIndex = i % 3; // RGB only
+                const byteIndex = pixelIndex * 4 + channelIndex;
+
+                if (byteIndex < pixels.length) {
+                    pixels[byteIndex] = this.setLSB(pixels[byteIndex], payloadBits[i], lsbDepth);
+                }
+            }
+
+            return {
+                bitsEncoded: payloadBits.length,
+                bytesEncoded: payloadBytes.length
+            };
+        }
+
+        preparePayload(data) {
+            const jsonStr = typeof data === 'string' ? data : JSON.stringify(data);
+            const bytes = new TextEncoder().encode(jsonStr);
+
+            // Header: magic (2) + length (2) + crc32 (4)
+            const header = new Uint8Array(8);
+            header[0] = MRP_MAGIC[0];
+            header[1] = MRP_MAGIC[1];
+            header[2] = (bytes.length >> 8) & 0xFF;
+            header[3] = bytes.length & 0xFF;
+
+            const crc = this.crc32(bytes);
+            header[4] = (crc >> 24) & 0xFF;
+            header[5] = (crc >> 16) & 0xFF;
+            header[6] = (crc >> 8) & 0xFF;
+            header[7] = crc & 0xFF;
+
+            const result = new Uint8Array(8 + bytes.length);
+            result.set(header, 0);
+            result.set(bytes, 8);
+
+            return Array.from(result);
+        }
+
+        bytesToBits(bytes) {
+            const bits = [];
+            for (const byte of bytes) {
+                for (let i = 0; i < 8; i++) {
+                    bits.push((byte >> i) & 1);
+                }
+            }
+            return bits;
+        }
+
+        crc32(data) {
+            let crc = 0xFFFFFFFF;
+            for (const byte of data) {
+                crc ^= byte;
+                for (let i = 0; i < 8; i++) {
+                    crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+                }
+            }
+            return (~crc) >>> 0;
+        }
+    }
+
+    const encoder = new BadgeLSBEncoder(ctx);
+
+    // ============================================================================
+    // Badge Renderer
+    // ============================================================================
+
+    function renderBadge(options = {}) {
+        const {
+            territory = currentTerritory,
+            guardian = selectedGuardian,
+            category = currentCategory,
+            size = 256
+        } = options;
+
+        const config = TERRITORIES[territory];
+        const cx = size / 2;
+        const cy = size / 2;
+        const radius = size / 2 - 4;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, size, size);
+
+        // Create circular clip
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, 2 * PI);
+        ctx.clip();
+
+        // Background gradient (radial)
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        gradient.addColorStop(0, config.gradient[0]);
+        gradient.addColorStop(0.5, config.gradient[1]);
+        gradient.addColorStop(1, config.gradient[2]);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // L4 corridor rays
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < L4; i++) {
+            const angle = (i / L4) * 2 * PI - PI / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+            ctx.stroke();
+        }
+
+        // Inner circle
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius * 0.6, 0, 2 * PI);
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Guardian symbol if selected
+        if (guardian) {
+            ctx.fillStyle = 'rgba(255,255,255,0.9)';
+            ctx.font = `bold ${size * 0.25}px 'Orbitron', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(guardian.icon, cx, cy);
+        } else {
+            // Default territory symbol
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.font = `bold ${size * 0.3}px 'Orbitron', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(territory[0].toUpperCase(), cx, cy);
+        }
+
+        // Decorative outer ring
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius - 8, 0, 2 * PI);
+        ctx.strokeStyle = config.color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Phi spiral decoration
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1;
+        for (let t = 0; t < 4 * PI; t += 0.05) {
+            const r = 20 * Math.pow(PHI, t / PI);
+            if (r > radius - 20) break;
+            const x = cx + r * Math.cos(t);
+            const y = cy + r * Math.sin(t);
+            if (t === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        ctx.restore();
+
+        // Outer border
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, 2 * PI);
+        ctx.strokeStyle = config.color;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+    }
+
+    // ============================================================================
+    // Protocol Generation
+    // ============================================================================
+
+    function generateProtocol() {
+        const lattice = [
+            parseInt(document.getElementById('lat_a').value) || 0,
+            parseInt(document.getElementById('lat_b').value) || 0,
+            parseInt(document.getElementById('lat_c').value) || 0,
+            parseInt(document.getElementById('lat_d').value) || 0,
+            parseInt(document.getElementById('lat_f').value) || 0
+        ];
+
+        const protocol = {
+            protocol: 'bloom:badge:v1',
+            territory: currentTerritory,
+            category: currentCategory,
+            guardian: selectedGuardian ? selectedGuardian.name : null,
+            guardianId: selectedGuardian ? selectedGuardian.id : null,
+            name: document.getElementById('badgeName').value,
+            lattice: lattice,
+            customPayload: document.getElementById('protocolPayload').value,
+            timestamp: Date.now(),
+            constants: {
+                phi: PHI.toFixed(8),
+                l4: L4
+            }
+        };
+
+        // Calculate signature hash
+        protocol.signature = hashProtocol(protocol);
+
+        return protocol;
+    }
+
+    function hashProtocol(protocol) {
+        const str = JSON.stringify(protocol);
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash).toString(16).padStart(8, '0');
+    }
+
+    // ============================================================================
+    // Cache Management
+    // ============================================================================
+
+    const DB_NAME = 'BloomCoinBadges';
+    const STORE_NAME = 'badges';
+    let db = null;
+
+    async function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => {
+                db = request.result;
+                resolve(db);
+            };
+            request.onupgradeneeded = (e) => {
+                const database = e.target.result;
+                if (!database.objectStoreNames.contains(STORE_NAME)) {
+                    database.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+        });
+    }
+
+    async function saveBadge(badge) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([STORE_NAME], 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.add(badge);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    async function loadBadges() {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([STORE_NAME], 'readonly');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.getAll();
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    async function deleteBadge(id) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction([STORE_NAME], 'readwrite');
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.delete(id);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+        });
+    }
+
+    // ============================================================================
+    // UI Updates
+    // ============================================================================
+
+    function updateGuardianGrid() {
+        const grid = document.getElementById('guardianGrid');
+        const guardians = TERRITORIES[currentTerritory].guardians;
+
+        grid.innerHTML = guardians.map(g => `
+            <div class="guardian-option" data-id="${g.id}">
+                <div class="icon">${g.icon}</div>
+                <div class="info">
+                    <div class="name">${g.name}</div>
+                    <div class="role">${g.role}</div>
+                </div>
+            </div>
+        `).join('');
+
+        // Bind events
+        grid.querySelectorAll('.guardian-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                grid.querySelectorAll('.guardian-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedGuardian = guardians.find(g => g.id === opt.dataset.id);
+                document.getElementById('badgeName').value = selectedGuardian.name + ' Badge';
+                generateAndDisplay();
+            });
+        });
+    }
+
+    function updateProtocolDisplay() {
+        const protocol = generateProtocol();
+        document.getElementById('protocolOutput').textContent = JSON.stringify(protocol, null, 2);
+    }
+
+    function updatePreviewInfo() {
+        const name = document.getElementById('badgeName').value || 'Badge';
+        document.getElementById('previewName').textContent = name;
+
+        const territoryEl = document.getElementById('previewTerritory');
+        territoryEl.textContent = `${currentTerritory.toUpperCase()} TERRITORY`;
+        territoryEl.className = `badge-territory ${currentTerritory}`;
+    }
+
+    async function updateBadgeLibrary() {
+        cachedBadges = await loadBadges();
+        const library = document.getElementById('badgeLibrary');
+
+        if (cachedBadges.length === 0) {
+            library.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.75rem;">No cached badges</div>';
+            return;
+        }
+
+        library.innerHTML = cachedBadges.map(badge => `
+            <div class="library-badge" data-id="${badge.id}" title="${badge.protocol.name}">
+                <img src="${badge.imageData}" style="width: 100%; height: 100%; border-radius: 50%;">
+                <div class="badge-label">${badge.protocol.name.substring(0, 10)}</div>
+            </div>
+        `).join('');
+
+        library.querySelectorAll('.library-badge').forEach(el => {
+            el.addEventListener('click', () => loadBadgeFromLibrary(parseInt(el.dataset.id)));
+        });
+    }
+
+    function loadBadgeFromLibrary(id) {
+        const badge = cachedBadges.find(b => b.id === id);
+        if (badge) {
+            currentTerritory = badge.protocol.territory;
+            currentCategory = badge.protocol.category;
+            document.getElementById('badgeName').value = badge.protocol.name;
+
+            // Update UI
+            document.querySelectorAll('.territory-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.territory === currentTerritory);
+            });
+
+            updateGuardianGrid();
+            generateAndDisplay();
+            toast('Badge loaded from library');
+        }
+    }
+
+    // ============================================================================
+    // Main Functions
+    // ============================================================================
+
+    function generateAndDisplay() {
+        renderBadge();
+        updateProtocolDisplay();
+        updatePreviewInfo();
+    }
+
+    function generateWithLSB() {
+        renderBadge();
+
+        const protocol = generateProtocol();
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const lsbDepth = parseInt(document.getElementById('lsbDepth').value);
+
+        const result = encoder.encode(imageData, protocol, lsbDepth);
+        ctx.putImageData(imageData, 0, 0);
+
+        updateProtocolDisplay();
+        updatePreviewInfo();
+
+        toast(`Badge generated with ${result.bytesEncoded} bytes encoded`);
+    }
+
+    async function saveBadgeToCache() {
+        const protocol = generateProtocol();
+        const imageData = canvas.toDataURL('image/png');
+
+        await saveBadge({
+            protocol,
+            imageData,
+            timestamp: Date.now()
+        });
+
+        await updateBadgeLibrary();
+        toast('Badge saved to cache');
+    }
+
+    function downloadBadge() {
+        const link = document.createElement('a');
+        link.download = `bloomcoin-badge-${currentTerritory}-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        toast('Badge downloaded');
+    }
+
+    function randomizeBadge() {
+        const territories = Object.keys(TERRITORIES);
+        currentTerritory = territories[Math.floor(Math.random() * territories.length)];
+
+        document.querySelectorAll('.territory-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.territory === currentTerritory);
+        });
+
+        updateGuardianGrid();
+
+        const guardians = TERRITORIES[currentTerritory].guardians;
+        selectedGuardian = guardians[Math.floor(Math.random() * guardians.length)];
+        document.getElementById('badgeName').value = selectedGuardian.name + ' Badge';
+
+        // Random lattice
+        for (const id of ['lat_a', 'lat_b', 'lat_c', 'lat_d', 'lat_f']) {
+            document.getElementById(id).value = Math.floor(Math.random() * 41) - 20;
+        }
+
+        generateWithLSB();
+    }
+
+    function toast(message) {
+        const container = document.getElementById('toastContainer');
+        const el = document.createElement('div');
+        el.className = 'toast';
+        el.textContent = message;
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+    }
+
+    // ============================================================================
+    // Event Bindings
+    // ============================================================================
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        await initDB();
+        updateGuardianGrid();
+        generateAndDisplay();
+        await updateBadgeLibrary();
+
+        // Territory buttons
+        document.querySelectorAll('.territory-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.territory-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTerritory = btn.dataset.territory;
+                selectedGuardian = null;
+                updateGuardianGrid();
+                generateAndDisplay();
+            });
+        });
+
+        // Category buttons
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentCategory = btn.dataset.cat;
+                generateAndDisplay();
+            });
+        });
+
+        // Input changes
+        document.getElementById('badgeName').addEventListener('input', updatePreviewInfo);
+        document.getElementById('protocolPayload').addEventListener('input', updateProtocolDisplay);
+
+        // Buttons
+        document.getElementById('generateBadgeBtn').addEventListener('click', generateWithLSB);
+        document.getElementById('randomizeBtn').addEventListener('click', randomizeBadge);
+        document.getElementById('saveCacheBtn').addEventListener('click', saveBadgeToCache);
+        document.getElementById('downloadBtn').addEventListener('click', downloadBadge);
+        document.getElementById('exportAllBtn').addEventListener('click', async () => {
+            const badges = await loadBadges();
+            const dataStr = JSON.stringify(badges, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.download = 'bloomcoin-badges-export.json';
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            toast('All badges exported');
+        });
+    });
+    </script>
+</body>
+</html>

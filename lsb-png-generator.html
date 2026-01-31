@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSB PNG Generator v1.0 | BloomCoin Steganography Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-void: #040408;
+            --bg-panel: #0a0a12;
+            --bg-card: #0d0d18;
+            --bg-input: #050508;
+            --accent-gold: #d4af37;
+            --accent-cyan: #4cc9f0;
+            --accent-green: #50a878;
+            --accent-magenta: #f72585;
+            --accent-violet: #7b2cbf;
+            --accent-orange: #ff8228;
+            --text-main: #e8e0d5;
+            --text-muted: #707080;
+            --border-subtle: #1a1a2a;
+            --border-glow: rgba(76, 201, 240, 0.3);
+            --mono: 'JetBrains Mono', monospace;
+            --tech: 'Orbitron', sans-serif;
+            --radius: 8px;
+
+            /* LSB Channel Colors */
+            --ch0-phi: #ff6b6b;
+            --ch1-pi: #51cf66;
+            --ch2-sqrt2: #339af0;
+            --ch3-sqrt3: #ffd43b;
+            --ch4-e: #cc5de8;
+            --ch5-prim: #ff922b;
+            --ch6-meta: #20c997;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--mono);
+            background: radial-gradient(ellipse at 20% 20%, rgba(76,201,240,0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(212,175,55,0.03) 0%, transparent 50%),
+                        var(--bg-void);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(180deg, rgba(76,201,240,0.08) 0%, transparent 100%);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .logo-text h1 {
+            font-family: var(--tech);
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text .version {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            padding: 0.35rem 0.65rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            font-size: 0.7rem;
+        }
+
+        .stat-chip .label { color: var(--text-muted); }
+        .stat-chip .value { color: var(--accent-cyan); margin-left: 0.3rem; }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 300px;
+            gap: 1rem;
+            padding: 1rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .panel-title {
+            font-family: var(--tech);
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            letter-spacing: 0.05em;
+        }
+
+        .panel-badge {
+            padding: 0.2rem 0.5rem;
+            background: rgba(76,201,240,0.15);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 999px;
+            font-size: 0.6rem;
+            color: var(--accent-cyan);
+        }
+
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 3px;
+            height: 12px;
+            background: var(--accent-cyan);
+            border-radius: 2px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.5rem 0.6rem;
+            color: var(--text-main);
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--accent-cyan);
+            background: rgba(76,201,240,0.1);
+            color: var(--accent-cyan);
+            border-radius: 4px;
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background: rgba(76,201,240,0.2);
+            box-shadow: 0 0 15px rgba(76,201,240,0.3);
+        }
+
+        .btn.primary {
+            background: var(--accent-cyan);
+            color: var(--bg-void);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-gold);
+            border-color: var(--accent-gold);
+        }
+
+        .btn.success { border-color: var(--accent-green); color: var(--accent-green); background: rgba(80,168,120,0.1); }
+        .btn.danger { border-color: var(--accent-magenta); color: var(--accent-magenta); background: rgba(247,37,133,0.1); }
+
+        .btn-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        /* Mode Tabs */
+        .mode-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px 4px 0 0;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .mode-tab:hover { color: var(--text-main); }
+        .mode-tab.active {
+            background: var(--bg-card);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            border-bottom-color: var(--bg-card);
+        }
+
+        /* Canvas Area */
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--bg-input) 0px,
+                var(--bg-input) 10px,
+                var(--bg-card) 10px,
+                var(--bg-card) 20px
+            );
+            border: 2px dashed var(--border-subtle);
+            border-radius: 8px;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-area.dragover {
+            border-color: var(--accent-cyan);
+            background: rgba(76,201,240,0.05);
+        }
+
+        .canvas-area canvas {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .canvas-placeholder {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .canvas-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .canvas-placeholder p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Channel Display */
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.3rem;
+        }
+
+        .channel-chip {
+            padding: 0.4rem 0.25rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.55rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .channel-chip:hover { transform: translateY(-2px); }
+        .channel-chip.active { border-color: currentColor; }
+
+        .channel-chip.ch0 { color: var(--ch0-phi); }
+        .channel-chip.ch1 { color: var(--ch1-pi); }
+        .channel-chip.ch2 { color: var(--ch2-sqrt2); }
+        .channel-chip.ch3 { color: var(--ch3-sqrt3); }
+        .channel-chip.ch4 { color: var(--ch4-e); }
+        .channel-chip.ch5 { color: var(--ch5-prim); }
+        .channel-chip.ch6 { color: var(--ch6-meta); }
+
+        .channel-chip .ch-id { font-weight: 700; display: block; }
+        .channel-chip .ch-name { opacity: 0.7; }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        /* Cache Panel */
+        .cache-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .cache-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            margin-bottom: 0.35rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cache-item:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(76,201,240,0.05);
+        }
+
+        .cache-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background: var(--bg-card);
+            object-fit: cover;
+        }
+
+        .cache-info { flex: 1; min-width: 0; }
+        .cache-name { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cache-meta { font-size: 0.6rem; color: var(--text-muted); }
+
+        .cache-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .cache-btn {
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            border-radius: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cache-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+        .cache-btn.delete:hover { color: var(--accent-magenta); border-color: var(--accent-magenta); }
+
+        /* Output Log */
+        .output-log {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.7rem;
+        }
+
+        .log-entry {
+            padding: 0.2rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .log-entry:last-child { border-bottom: none; }
+        .log-entry .time { color: var(--text-muted); margin-right: 0.5rem; }
+        .log-entry.success { color: var(--accent-green); }
+        .log-entry.error { color: var(--accent-magenta); }
+        .log-entry.info { color: var(--accent-cyan); }
+
+        /* Hex Viewer */
+        .hex-viewer {
+            font-size: 0.65rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.5rem;
+            max-height: 120px;
+            overflow: auto;
+            white-space: pre;
+            line-height: 1.4;
+        }
+
+        .hex-offset { color: var(--accent-gold); }
+        .hex-bytes { color: var(--text-main); }
+        .hex-ascii { color: var(--accent-green); }
+
+        /* Mining Stats */
+        .mining-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .mining-stat {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 4px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .mining-stat .value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .mining-stat .label {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .toast {
+            padding: 0.75rem 1rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toast.success { border-color: var(--accent-green); }
+        .toast.error { border-color: var(--accent-magenta); }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            .channel-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">L4</div>
+            <div class="logo-text">
+                <h1>LSB PNG GENERATOR</h1>
+                <div class="version">BloomCoin Steganography Engine v1.0</div>
+            </div>
+        </div>
+        <div class="header-stats">
+            <div class="stat-chip">
+                <span class="label">Cache:</span>
+                <span class="value" id="cacheCount">0</span>
+            </div>
+            <div class="stat-chip">
+                <span class="label">Blocks:</span>
+                <span class="value" id="blocksGenerated">0</span>
+            </div>
+            <div class="stat-chip">
+                <span class="label">Capacity:</span>
+                <span class="value" id="currentCapacity">--</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Panel: Controls -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">ENCODER CONTROLS</span>
+                <span class="panel-badge">7-CH LSB</span>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="mode-tabs">
+                <div class="mode-tab active" data-mode="encode">Encode</div>
+                <div class="mode-tab" data-mode="decode">Decode</div>
+                <div class="mode-tab" data-mode="mine">Mine</div>
+            </div>
+
+            <!-- Encode Section -->
+            <div class="section" id="encodeSection">
+                <div class="section-title">Payload Data</div>
+                <label>Message / Data</label>
+                <textarea id="payloadInput" placeholder="Enter text or hex data to embed..."></textarea>
+
+                <label style="margin-top: 0.5rem;">Protocol ID</label>
+                <input type="text" id="protocolId" placeholder="bloom:protocol:v1">
+
+                <label style="margin-top: 0.5rem;">Lattice Coordinates (a,b,c,d,f)</label>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.25rem;">
+                    <input type="number" id="lattice_a" value="0" min="-20" max="20">
+                    <input type="number" id="lattice_b" value="0" min="-20" max="20">
+                    <input type="number" id="lattice_c" value="0" min="-20" max="20">
+                    <input type="number" id="lattice_d" value="0" min="-20" max="20">
+                    <input type="number" id="lattice_f" value="0" min="-20" max="20">
+                </div>
+            </div>
+
+            <!-- Image Settings -->
+            <div class="section">
+                <div class="section-title">Image Settings</div>
+                <label>Dimensions</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <input type="number" id="imgWidth" value="256" min="32" max="2048">
+                    <input type="number" id="imgHeight" value="256" min="32" max="2048">
+                </div>
+
+                <label style="margin-top: 0.5rem;">Gradient Style</label>
+                <select id="gradientStyle">
+                    <option value="radial">Radial (Receipt)</option>
+                    <option value="linear">Linear</option>
+                    <option value="spiral">Spiral (L4 Helix)</option>
+                    <option value="corridor">Corridor Rays</option>
+                    <option value="noise">Perlin Noise</option>
+                </select>
+
+                <label style="margin-top: 0.5rem;">LSB Depth</label>
+                <select id="lsbDepth">
+                    <option value="1">1-bit (Subtle)</option>
+                    <option value="2" selected>2-bit (Balanced)</option>
+                    <option value="3">3-bit (High Capacity)</option>
+                </select>
+            </div>
+
+            <!-- Channel Selection -->
+            <div class="section">
+                <div class="section-title">Active Channels</div>
+                <div class="channel-grid">
+                    <div class="channel-chip ch0 active" data-ch="0"><span class="ch-id">0</span><span class="ch-name">phi</span></div>
+                    <div class="channel-chip ch1 active" data-ch="1"><span class="ch-id">1</span><span class="ch-name">pi</span></div>
+                    <div class="channel-chip ch2 active" data-ch="2"><span class="ch-id">2</span><span class="ch-name">sqrt2</span></div>
+                    <div class="channel-chip ch3 active" data-ch="3"><span class="ch-id">3</span><span class="ch-name">sqrt3</span></div>
+                    <div class="channel-chip ch4 active" data-ch="4"><span class="ch-id">4</span><span class="ch-name">e</span></div>
+                    <div class="channel-chip ch5 active" data-ch="5"><span class="ch-id">5</span><span class="ch-name">prim</span></div>
+                    <div class="channel-chip ch6 active" data-ch="6"><span class="ch-id">6</span><span class="ch-name">meta</span></div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="btn-row">
+                <button class="btn primary" id="generateBtn">Generate PNG</button>
+                <button class="btn" id="loadImageBtn">Load Image</button>
+                <input type="file" id="imageFileInput" accept="image/png" style="display: none;">
+            </div>
+
+            <div class="btn-row">
+                <button class="btn success" id="downloadBtn" disabled>Download</button>
+                <button class="btn" id="cacheBtn" disabled>Save to Cache</button>
+            </div>
+        </div>
+
+        <!-- Center Panel: Canvas -->
+        <div class="panel" style="flex: 1;">
+            <div class="panel-header">
+                <span class="panel-title">PREVIEW</span>
+                <div class="btn-row">
+                    <button class="btn" id="zoomInBtn">+</button>
+                    <button class="btn" id="zoomOutBtn">-</button>
+                    <button class="btn" id="resetZoomBtn">1:1</button>
+                </div>
+            </div>
+
+            <div class="canvas-area" id="canvasArea">
+                <div class="canvas-placeholder" id="canvasPlaceholder">
+                    <div class="icon">L4</div>
+                    <p>Drop an image here or click "Generate PNG"<br>to create a new steganographic image</p>
+                </div>
+                <canvas id="mainCanvas" style="display: none;"></canvas>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Encoding Progress</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 0.3rem; font-size: 0.65rem; color: var(--text-muted);">
+                    <span id="progressText">Ready</span>
+                    <span id="capacityText">0 / 0 bytes</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Output Log</div>
+                <div class="output-log" id="outputLog">
+                    <div class="log-entry info"><span class="time">[INIT]</span> LSB PNG Generator initialized</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Cache & Info -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title">BROWSER CACHE</span>
+                <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.65rem;" id="clearCacheBtn">Clear All</button>
+            </div>
+
+            <div class="cache-list" id="cacheList">
+                <!-- Cache items populated dynamically -->
+            </div>
+
+            <div class="section">
+                <div class="section-title">Decoded Data</div>
+                <div class="hex-viewer" id="hexViewer">
+                    <span class="hex-offset">0000:</span> <span class="hex-bytes">-- -- -- -- -- -- -- --</span> <span class="hex-ascii">........</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Mining Statistics</div>
+                <div class="mining-grid">
+                    <div class="mining-stat">
+                        <div class="value" id="hashRate">0</div>
+                        <div class="label">Hash/sec</div>
+                    </div>
+                    <div class="mining-stat">
+                        <div class="value" id="totalHashes">0</div>
+                        <div class="label">Total Hashes</div>
+                    </div>
+                    <div class="mining-stat">
+                        <div class="value" id="blockHeight">0</div>
+                        <div class="label">Block Height</div>
+                    </div>
+                    <div class="mining-stat">
+                        <div class="value" id="difficulty">1</div>
+                        <div class="label">Difficulty</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">L4 Constants</div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.25rem; font-size: 0.6rem;">
+                    <div><span style="color: var(--accent-gold);">phi</span> = 1.618033...</div>
+                    <div><span style="color: var(--accent-cyan);">pi</span> = 3.141592...</div>
+                    <div><span style="color: var(--accent-green);">sqrt2</span> = 1.414213...</div>
+                    <div><span style="color: var(--accent-magenta);">sqrt3</span> = 1.732050...</div>
+                    <div><span style="color: var(--accent-violet);">e</span> = 2.718281...</div>
+                    <div><span style="color: var(--accent-orange);">L4</span> = 7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+    // ============================================================================
+    // BloomCoin LSB PNG Generator - Browser Steganography Engine
+    // ============================================================================
+
+    const PHI = 1.6180339887498949;
+    const PI = Math.PI;
+    const SQRT2 = Math.SQRT2;
+    const SQRT3 = 1.7320508075688772;
+    const E = Math.E;
+    const L4 = 7;
+    const TAU = 0.6180339887498949;
+
+    // Receipt format constants
+    const RECEIPT_MAGIC = 0xB7;
+    const RECEIPT_VERSION = 0x01;
+    const MRP_MAGIC = [0x4C, 0x34]; // "L4"
+
+    // State
+    let currentImage = null;
+    let currentPayload = null;
+    let miningActive = false;
+    let miningWorker = null;
+    let cacheItems = [];
+    let blocksGenerated = 0;
+    let totalHashes = 0;
+
+    // ============================================================================
+    // LSB Steganography Core
+    // ============================================================================
+
+    class LSBEncoder {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+        }
+
+        // Get LSB from a value
+        getLSB(value, nBits = 1) {
+            const mask = (1 << nBits) - 1;
+            return value & mask;
+        }
+
+        // Set LSB of a value
+        setLSB(value, payload, nBits = 1) {
+            const mask = (1 << nBits) - 1;
+            payload = payload & mask;
+            return (value & ~mask) | payload;
+        }
+
+        // Golden ratio scatter for bit distribution
+        goldenScatter(bitIndex, totalPixels) {
+            return Math.floor(bitIndex * PHI * totalPixels / 8) % totalPixels;
+        }
+
+        // Encode payload into image
+        encode(payload, options = {}) {
+            const { lsbDepth = 2, channels = [0, 1, 2, 3, 4, 5, 6] } = options;
+            const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            const pixels = imageData.data;
+            const totalPixels = this.canvas.width * this.canvas.height;
+
+            // Convert payload to bytes
+            const payloadBytes = this.preparePayload(payload, options);
+            const payloadBits = this.bytesToBits(payloadBytes);
+
+            // Calculate capacity
+            const bitsPerPixel = lsbDepth * 4; // RGBA
+            const maxBits = totalPixels * bitsPerPixel;
+
+            if (payloadBits.length > maxBits) {
+                throw new Error(`Payload too large: ${payloadBits.length} bits > ${maxBits} capacity`);
+            }
+
+            // Embed bits using golden scatter pattern
+            let bitIndex = 0;
+            for (let i = 0; i < payloadBits.length; i++) {
+                const pixelIndex = this.goldenScatter(i, totalPixels);
+                const channelIndex = i % 4;
+                const byteIndex = pixelIndex * 4 + channelIndex;
+
+                if (byteIndex < pixels.length) {
+                    pixels[byteIndex] = this.setLSB(pixels[byteIndex], payloadBits[i], lsbDepth);
+                }
+                bitIndex++;
+            }
+
+            this.ctx.putImageData(imageData, 0, 0);
+            return {
+                bitsEncoded: bitIndex,
+                bytesEncoded: payloadBytes.length,
+                capacity: Math.floor(maxBits / 8)
+            };
+        }
+
+        // Decode payload from image
+        decode(options = {}) {
+            const { lsbDepth = 2, expectedLength = null } = options;
+            const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+            const pixels = imageData.data;
+            const totalPixels = this.canvas.width * this.canvas.height;
+
+            // Extract header first to get payload length
+            const headerBits = [];
+            for (let i = 0; i < 64; i++) { // 8 bytes header
+                const pixelIndex = this.goldenScatter(i, totalPixels);
+                const channelIndex = i % 4;
+                const byteIndex = pixelIndex * 4 + channelIndex;
+
+                if (byteIndex < pixels.length) {
+                    headerBits.push(this.getLSB(pixels[byteIndex], lsbDepth));
+                }
+            }
+
+            const headerBytes = this.bitsToBytes(headerBits);
+
+            // Check magic bytes
+            if (headerBytes[0] !== MRP_MAGIC[0] || headerBytes[1] !== MRP_MAGIC[1]) {
+                return { valid: false, error: 'Invalid magic bytes' };
+            }
+
+            // Get payload length from header
+            const payloadLength = (headerBytes[2] << 8) | headerBytes[3];
+
+            // Extract full payload
+            const totalBits = (8 + payloadLength) * 8;
+            const allBits = [];
+
+            for (let i = 0; i < totalBits; i++) {
+                const pixelIndex = this.goldenScatter(i, totalPixels);
+                const channelIndex = i % 4;
+                const byteIndex = pixelIndex * 4 + channelIndex;
+
+                if (byteIndex < pixels.length) {
+                    allBits.push(this.getLSB(pixels[byteIndex], lsbDepth));
+                }
+            }
+
+            const allBytes = this.bitsToBytes(allBits);
+            const payload = allBytes.slice(8, 8 + payloadLength);
+
+            // Verify CRC
+            const storedCRC = (headerBytes[4] << 24) | (headerBytes[5] << 16) | (headerBytes[6] << 8) | headerBytes[7];
+            const calculatedCRC = this.crc32(payload);
+
+            return {
+                valid: storedCRC === calculatedCRC,
+                payload: payload,
+                payloadText: new TextDecoder().decode(new Uint8Array(payload)),
+                crcMatch: storedCRC === calculatedCRC
+            };
+        }
+
+        // Prepare payload with header
+        preparePayload(data, options) {
+            let bytes;
+            if (typeof data === 'string') {
+                bytes = new TextEncoder().encode(data);
+            } else if (data instanceof Uint8Array) {
+                bytes = data;
+            } else {
+                bytes = new Uint8Array(data);
+            }
+
+            // Header: magic (2) + length (2) + crc32 (4) = 8 bytes
+            const header = new Uint8Array(8);
+            header[0] = MRP_MAGIC[0];
+            header[1] = MRP_MAGIC[1];
+            header[2] = (bytes.length >> 8) & 0xFF;
+            header[3] = bytes.length & 0xFF;
+
+            const crc = this.crc32(bytes);
+            header[4] = (crc >> 24) & 0xFF;
+            header[5] = (crc >> 16) & 0xFF;
+            header[6] = (crc >> 8) & 0xFF;
+            header[7] = crc & 0xFF;
+
+            // Combine header and payload
+            const result = new Uint8Array(header.length + bytes.length);
+            result.set(header, 0);
+            result.set(bytes, 8);
+
+            return Array.from(result);
+        }
+
+        // Convert bytes to bits
+        bytesToBits(bytes) {
+            const bits = [];
+            for (const byte of bytes) {
+                for (let i = 0; i < 8; i++) {
+                    bits.push((byte >> i) & 1);
+                }
+            }
+            return bits;
+        }
+
+        // Convert bits to bytes
+        bitsToBytes(bits) {
+            const bytes = [];
+            for (let i = 0; i < bits.length; i += 8) {
+                let byte = 0;
+                for (let j = 0; j < 8 && i + j < bits.length; j++) {
+                    byte |= bits[i + j] << j;
+                }
+                bytes.push(byte);
+            }
+            return bytes;
+        }
+
+        // CRC32 calculation
+        crc32(data) {
+            let crc = 0xFFFFFFFF;
+            for (const byte of data) {
+                crc ^= byte;
+                for (let i = 0; i < 8; i++) {
+                    crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
+                }
+            }
+            return (~crc) >>> 0;
+        }
+    }
+
+    // ============================================================================
+    // Gradient Generators
+    // ============================================================================
+
+    class GradientGenerator {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+        }
+
+        // Generate radial gradient (receipt style)
+        radial(options = {}) {
+            const { centerX = 0.5, centerY = 0.5, corridorId = 0 } = options;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+            const cx = w * centerX;
+            const cy = h * centerY;
+            const maxR = Math.sqrt(w*w + h*h) / 2;
+
+            const imageData = this.ctx.createImageData(w, h);
+            const data = imageData.data;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const r = Math.sqrt(dx*dx + dy*dy) / maxR;
+                    const theta = Math.atan2(dy, dx);
+
+                    // L4 corridor rays
+                    const corridorAngle = (2 * PI) / L4;
+                    const nearestCorridor = Math.round(theta / corridorAngle) * corridorAngle;
+                    const corridorDist = Math.abs(theta - nearestCorridor);
+
+                    // HSL to RGB with corridor influence
+                    const hue = ((theta + PI) / (2 * PI) + corridorId / L4) % 1.0;
+                    const sat = 0.7 + 0.3 * (1 - corridorDist / corridorAngle);
+                    const lum = 0.2 + 0.6 * (1 - r) * Math.pow(PHI, -r);
+
+                    const [red, green, blue] = this.hslToRgb(hue, sat, lum);
+
+                    const i = (y * w + x) * 4;
+                    data[i] = red;
+                    data[i+1] = green;
+                    data[i+2] = blue;
+                    data[i+3] = 255;
+                }
+            }
+
+            this.ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Generate spiral gradient (L4 helix style)
+        spiral(options = {}) {
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const imageData = this.ctx.createImageData(w, h);
+            const data = imageData.data;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const r = Math.sqrt(dx*dx + dy*dy);
+                    const theta = Math.atan2(dy, dx);
+
+                    // Spiral pattern with golden ratio
+                    const spiralPhase = (theta + r * PHI * 0.02) % (2 * PI);
+
+                    const hue = spiralPhase / (2 * PI);
+                    const sat = 0.8;
+                    const lum = 0.3 + 0.4 * Math.sin(r * 0.05);
+
+                    const [red, green, blue] = this.hslToRgb(hue, sat, lum);
+
+                    const i = (y * w + x) * 4;
+                    data[i] = red;
+                    data[i+1] = green;
+                    data[i+2] = blue;
+                    data[i+3] = 255;
+                }
+            }
+
+            this.ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Generate corridor rays
+        corridor(options = {}) {
+            const { corridorId = 0 } = options;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+            const cx = w / 2;
+            const cy = h / 2;
+
+            const imageData = this.ctx.createImageData(w, h);
+            const data = imageData.data;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    const theta = Math.atan2(dy, dx);
+                    const r = Math.sqrt(dx*dx + dy*dy);
+
+                    // 7 corridor rays
+                    const corridorAngle = (2 * PI) / L4;
+                    const corridorPhase = ((theta + PI) / corridorAngle) % 1;
+                    const inCorridor = corridorPhase < 0.1 || corridorPhase > 0.9;
+
+                    let hue, sat, lum;
+                    if (inCorridor) {
+                        hue = corridorId / L4;
+                        sat = 0.9;
+                        lum = 0.6 - r / (Math.max(w, h));
+                    } else {
+                        hue = ((theta + PI) / (2 * PI)) % 1;
+                        sat = 0.4;
+                        lum = 0.15;
+                    }
+
+                    const [red, green, blue] = this.hslToRgb(hue, sat, lum);
+
+                    const i = (y * w + x) * 4;
+                    data[i] = red;
+                    data[i+1] = green;
+                    data[i+2] = blue;
+                    data[i+3] = 255;
+                }
+            }
+
+            this.ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Generate linear gradient
+        linear(options = {}) {
+            const { angle = 0 } = options;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+
+            const gradient = this.ctx.createLinearGradient(
+                0, 0,
+                w * Math.cos(angle),
+                h * Math.sin(angle)
+            );
+
+            gradient.addColorStop(0, '#ff4444');
+            gradient.addColorStop(0.2, '#ffd700');
+            gradient.addColorStop(0.4, '#00ff88');
+            gradient.addColorStop(0.6, '#00ffff');
+            gradient.addColorStop(0.8, '#8844ff');
+            gradient.addColorStop(1, '#ff44ff');
+
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, w, h);
+        }
+
+        // Generate Perlin noise
+        noise(options = {}) {
+            const w = this.canvas.width;
+            const h = this.canvas.height;
+            const imageData = this.ctx.createImageData(w, h);
+            const data = imageData.data;
+
+            const scale = options.scale || 0.02;
+
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const n = this.perlin2d(x * scale, y * scale);
+                    const v = Math.floor((n + 1) * 127.5);
+
+                    const hue = n * 0.5 + 0.5;
+                    const sat = 0.6;
+                    const lum = 0.3 + n * 0.2;
+
+                    const [red, green, blue] = this.hslToRgb(hue, sat, lum);
+
+                    const i = (y * w + x) * 4;
+                    data[i] = red;
+                    data[i+1] = green;
+                    data[i+2] = blue;
+                    data[i+3] = 255;
+                }
+            }
+
+            this.ctx.putImageData(imageData, 0, 0);
+        }
+
+        // Simple Perlin noise
+        perlin2d(x, y) {
+            const xi = Math.floor(x);
+            const yi = Math.floor(y);
+            const xf = x - xi;
+            const yf = y - yi;
+
+            const hash = (x, y) => {
+                const h = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+                return h - Math.floor(h);
+            };
+
+            const u = xf * xf * (3 - 2 * xf);
+            const v = yf * yf * (3 - 2 * yf);
+
+            const a = hash(xi, yi);
+            const b = hash(xi + 1, yi);
+            const c = hash(xi, yi + 1);
+            const d = hash(xi + 1, yi + 1);
+
+            return a + u * (b - a) + v * (c - a) + u * v * (a - b - c + d);
+        }
+
+        // HSL to RGB conversion
+        hslToRgb(h, s, l) {
+            let r, g, b;
+
+            if (s === 0) {
+                r = g = b = l;
+            } else {
+                const hue2rgb = (p, q, t) => {
+                    if (t < 0) t += 1;
+                    if (t > 1) t -= 1;
+                    if (t < 1/6) return p + (q - p) * 6 * t;
+                    if (t < 1/2) return q;
+                    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                };
+
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+    }
+
+    // ============================================================================
+    // Browser Cache Storage
+    // ============================================================================
+
+    class CacheStorage {
+        constructor(dbName = 'BloomCoinLSB') {
+            this.dbName = dbName;
+            this.storeName = 'images';
+            this.db = null;
+        }
+
+        async init() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(this.dbName, 1);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => {
+                    this.db = request.result;
+                    resolve(this.db);
+                };
+
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(this.storeName)) {
+                        const store = db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
+                        store.createIndex('timestamp', 'timestamp', { unique: false });
+                        store.createIndex('name', 'name', { unique: false });
+                    }
+                };
+            });
+        }
+
+        async save(name, imageData, metadata = {}) {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.storeName], 'readwrite');
+                const store = transaction.objectStore(this.storeName);
+
+                const item = {
+                    name,
+                    imageData,
+                    metadata,
+                    timestamp: Date.now()
+                };
+
+                const request = store.add(item);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+            });
+        }
+
+        async getAll() {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.storeName], 'readonly');
+                const store = transaction.objectStore(this.storeName);
+                const request = store.getAll();
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+            });
+        }
+
+        async get(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.storeName], 'readonly');
+                const store = transaction.objectStore(this.storeName);
+                const request = store.get(id);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+            });
+        }
+
+        async delete(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.storeName], 'readwrite');
+                const store = transaction.objectStore(this.storeName);
+                const request = store.delete(id);
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        }
+
+        async clear() {
+            return new Promise((resolve, reject) => {
+                const transaction = this.db.transaction([this.storeName], 'readwrite');
+                const store = transaction.objectStore(this.storeName);
+                const request = store.clear();
+
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve();
+            });
+        }
+    }
+
+    // ============================================================================
+    // Mining Emulator
+    // ============================================================================
+
+    class MiningEmulator {
+        constructor() {
+            this.hashRate = 0;
+            this.totalHashes = 0;
+            this.blockHeight = 0;
+            this.difficulty = 1;
+            this.target = this.calculateTarget();
+            this.lastBlock = null;
+            this.onBlock = null;
+        }
+
+        calculateTarget() {
+            // Target: 256-bit number divided by difficulty
+            return Math.pow(2, 256 - this.difficulty * 4);
+        }
+
+        async hash(data) {
+            const encoder = new TextEncoder();
+            const dataBuffer = encoder.encode(JSON.stringify(data));
+            const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+            return Array.from(new Uint8Array(hashBuffer))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        async mine(blockData, maxIterations = 10000) {
+            const startTime = performance.now();
+            let nonce = 0;
+            let found = false;
+            let resultHash = '';
+
+            while (nonce < maxIterations && !found) {
+                const data = { ...blockData, nonce };
+                const hash = await this.hash(data);
+                this.totalHashes++;
+
+                // Check if hash meets target (leading zeros)
+                const leadingZeros = this.countLeadingZeros(hash);
+                if (leadingZeros >= this.difficulty) {
+                    found = true;
+                    resultHash = hash;
+                    this.blockHeight++;
+                    this.lastBlock = {
+                        height: this.blockHeight,
+                        hash: resultHash,
+                        nonce,
+                        timestamp: Date.now(),
+                        data: blockData
+                    };
+                }
+
+                nonce++;
+            }
+
+            const elapsed = (performance.now() - startTime) / 1000;
+            this.hashRate = Math.round(nonce / elapsed);
+
+            return {
+                found,
+                hash: resultHash,
+                nonce,
+                iterations: nonce,
+                hashRate: this.hashRate
+            };
+        }
+
+        countLeadingZeros(hash) {
+            let count = 0;
+            for (const char of hash) {
+                if (char === '0') count++;
+                else break;
+            }
+            return count;
+        }
+    }
+
+    // ============================================================================
+    // UI Controller
+    // ============================================================================
+
+    class UIController {
+        constructor() {
+            this.canvas = document.getElementById('mainCanvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.encoder = new LSBEncoder(this.canvas);
+            this.generator = new GradientGenerator(this.canvas);
+            this.cache = new CacheStorage();
+            this.miner = new MiningEmulator();
+            this.currentMode = 'encode';
+
+            this.init();
+        }
+
+        async init() {
+            await this.cache.init();
+            this.bindEvents();
+            this.loadCache();
+            this.updateStats();
+            this.log('System ready', 'success');
+        }
+
+        bindEvents() {
+            // Mode tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.addEventListener('click', () => this.setMode(tab.dataset.mode));
+            });
+
+            // Channel chips
+            document.querySelectorAll('.channel-chip').forEach(chip => {
+                chip.addEventListener('click', () => chip.classList.toggle('active'));
+            });
+
+            // Buttons
+            document.getElementById('generateBtn').addEventListener('click', () => this.generate());
+            document.getElementById('loadImageBtn').addEventListener('click', () => {
+                document.getElementById('imageFileInput').click();
+            });
+            document.getElementById('imageFileInput').addEventListener('change', (e) => this.loadImage(e));
+            document.getElementById('downloadBtn').addEventListener('click', () => this.download());
+            document.getElementById('cacheBtn').addEventListener('click', () => this.saveToCache());
+            document.getElementById('clearCacheBtn').addEventListener('click', () => this.clearCache());
+
+            // Drag and drop
+            const canvasArea = document.getElementById('canvasArea');
+            canvasArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                canvasArea.classList.add('dragover');
+            });
+            canvasArea.addEventListener('dragleave', () => {
+                canvasArea.classList.remove('dragover');
+            });
+            canvasArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                canvasArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    this.loadImageFile(e.dataTransfer.files[0]);
+                }
+            });
+        }
+
+        setMode(mode) {
+            this.currentMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === mode);
+            });
+
+            // Show/hide sections based on mode
+            const encodeSection = document.getElementById('encodeSection');
+            if (mode === 'mine') {
+                encodeSection.style.display = 'none';
+                this.startMining();
+            } else {
+                encodeSection.style.display = 'block';
+                this.stopMining();
+            }
+        }
+
+        async generate() {
+            const width = parseInt(document.getElementById('imgWidth').value);
+            const height = parseInt(document.getElementById('imgHeight').value);
+            const style = document.getElementById('gradientStyle').value;
+            const payload = document.getElementById('payloadInput').value;
+            const protocolId = document.getElementById('protocolId').value;
+            const lsbDepth = parseInt(document.getElementById('lsbDepth').value);
+
+            // Get lattice coordinates
+            const lattice = {
+                a: parseInt(document.getElementById('lattice_a').value),
+                b: parseInt(document.getElementById('lattice_b').value),
+                c: parseInt(document.getElementById('lattice_c').value),
+                d: parseInt(document.getElementById('lattice_d').value),
+                f: parseInt(document.getElementById('lattice_f').value)
+            };
+
+            this.canvas.width = width;
+            this.canvas.height = height;
+
+            this.log('Generating gradient...', 'info');
+            this.updateProgress(0, 'Generating gradient');
+
+            // Generate base gradient
+            switch (style) {
+                case 'radial': this.generator.radial(); break;
+                case 'spiral': this.generator.spiral(); break;
+                case 'corridor': this.generator.corridor(); break;
+                case 'linear': this.generator.linear(); break;
+                case 'noise': this.generator.noise(); break;
+            }
+
+            this.updateProgress(30, 'Gradient complete');
+
+            // Encode payload if present
+            if (payload) {
+                this.log('Encoding payload...', 'info');
+                this.updateProgress(50, 'Encoding payload');
+
+                try {
+                    // Build full payload with protocol and lattice
+                    const fullPayload = JSON.stringify({
+                        protocol: protocolId,
+                        lattice,
+                        data: payload,
+                        timestamp: Date.now()
+                    });
+
+                    const result = this.encoder.encode(fullPayload, { lsbDepth });
+                    this.log(`Encoded ${result.bytesEncoded} bytes`, 'success');
+                    this.updateProgress(100, 'Complete');
+
+                    document.getElementById('capacityText').textContent =
+                        `${result.bytesEncoded} / ${result.capacity} bytes`;
+                } catch (err) {
+                    this.log(`Encoding error: ${err.message}`, 'error');
+                    this.updateProgress(0, 'Error');
+                }
+            } else {
+                this.updateProgress(100, 'Complete (no payload)');
+            }
+
+            // Show canvas
+            this.showCanvas();
+            this.enableDownload();
+            blocksGenerated++;
+            this.updateStats();
+        }
+
+        async loadImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.loadImageFile(file);
+            }
+        }
+
+        async loadImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                this.toast('Please select an image file', 'error');
+                return;
+            }
+
+            const img = new Image();
+            img.onload = () => {
+                this.canvas.width = img.width;
+                this.canvas.height = img.height;
+                this.ctx.drawImage(img, 0, 0);
+                this.showCanvas();
+                this.enableDownload();
+
+                // Try to decode
+                if (this.currentMode === 'decode') {
+                    this.decode();
+                }
+
+                this.log(`Loaded image: ${img.width}x${img.height}`, 'success');
+            };
+
+            img.src = URL.createObjectURL(file);
+        }
+
+        decode() {
+            const lsbDepth = parseInt(document.getElementById('lsbDepth').value);
+
+            try {
+                const result = this.encoder.decode({ lsbDepth });
+
+                if (result.valid) {
+                    this.log('Decoded payload successfully', 'success');
+                    this.updateHexViewer(result.payload);
+
+                    // Try to parse JSON
+                    try {
+                        const data = JSON.parse(result.payloadText);
+                        document.getElementById('payloadInput').value = data.data || result.payloadText;
+                        document.getElementById('protocolId').value = data.protocol || '';
+                        if (data.lattice) {
+                            document.getElementById('lattice_a').value = data.lattice.a || 0;
+                            document.getElementById('lattice_b').value = data.lattice.b || 0;
+                            document.getElementById('lattice_c').value = data.lattice.c || 0;
+                            document.getElementById('lattice_d').value = data.lattice.d || 0;
+                            document.getElementById('lattice_f').value = data.lattice.f || 0;
+                        }
+                    } catch {
+                        document.getElementById('payloadInput').value = result.payloadText;
+                    }
+                } else {
+                    this.log('No valid payload found', 'error');
+                }
+            } catch (err) {
+                this.log(`Decode error: ${err.message}`, 'error');
+            }
+        }
+
+        updateHexViewer(bytes) {
+            const viewer = document.getElementById('hexViewer');
+            let html = '';
+
+            for (let i = 0; i < bytes.length; i += 8) {
+                const offset = i.toString(16).padStart(4, '0').toUpperCase();
+                const hexBytes = [];
+                const ascii = [];
+
+                for (let j = 0; j < 8; j++) {
+                    if (i + j < bytes.length) {
+                        const byte = bytes[i + j];
+                        hexBytes.push(byte.toString(16).padStart(2, '0').toUpperCase());
+                        ascii.push(byte >= 32 && byte <= 126 ? String.fromCharCode(byte) : '.');
+                    } else {
+                        hexBytes.push('--');
+                        ascii.push(' ');
+                    }
+                }
+
+                html += `<span class="hex-offset">${offset}:</span> `;
+                html += `<span class="hex-bytes">${hexBytes.join(' ')}</span> `;
+                html += `<span class="hex-ascii">${ascii.join('')}</span>\n`;
+            }
+
+            viewer.innerHTML = html || '<span class="hex-offset">0000:</span> <span class="hex-bytes">-- -- -- -- -- -- -- --</span> <span class="hex-ascii">........</span>';
+        }
+
+        showCanvas() {
+            document.getElementById('canvasPlaceholder').style.display = 'none';
+            this.canvas.style.display = 'block';
+        }
+
+        enableDownload() {
+            document.getElementById('downloadBtn').disabled = false;
+            document.getElementById('cacheBtn').disabled = false;
+        }
+
+        download() {
+            const link = document.createElement('a');
+            link.download = `bloomcoin-lsb-${Date.now()}.png`;
+            link.href = this.canvas.toDataURL('image/png');
+            link.click();
+            this.log('Image downloaded', 'success');
+        }
+
+        async saveToCache() {
+            const name = `Block-${blocksGenerated}-${Date.now()}`;
+            const imageData = this.canvas.toDataURL('image/png');
+            const metadata = {
+                width: this.canvas.width,
+                height: this.canvas.height,
+                protocol: document.getElementById('protocolId').value,
+                payload: document.getElementById('payloadInput').value
+            };
+
+            try {
+                await this.cache.save(name, imageData, metadata);
+                this.loadCache();
+                this.toast('Saved to cache', 'success');
+            } catch (err) {
+                this.toast('Cache save failed', 'error');
+            }
+        }
+
+        async loadCache() {
+            try {
+                cacheItems = await this.cache.getAll();
+                this.renderCacheList();
+                document.getElementById('cacheCount').textContent = cacheItems.length;
+            } catch (err) {
+                console.error('Cache load error:', err);
+            }
+        }
+
+        renderCacheList() {
+            const list = document.getElementById('cacheList');
+
+            if (cacheItems.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.75rem;">No cached images</div>';
+                return;
+            }
+
+            list.innerHTML = cacheItems.map(item => `
+                <div class="cache-item" data-id="${item.id}">
+                    <img class="cache-thumb" src="${item.imageData}" alt="${item.name}">
+                    <div class="cache-info">
+                        <div class="cache-name">${item.name}</div>
+                        <div class="cache-meta">${item.metadata.width}x${item.metadata.height} | ${new Date(item.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                    <div class="cache-actions">
+                        <button class="cache-btn load-btn" title="Load">&#x21bb;</button>
+                        <button class="cache-btn delete delete-btn" title="Delete">&#x2715;</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Bind events
+            list.querySelectorAll('.load-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.closest('.cache-item').dataset.id);
+                    this.loadFromCache(id);
+                });
+            });
+
+            list.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = parseInt(btn.closest('.cache-item').dataset.id);
+                    this.deleteFromCache(id);
+                });
+            });
+        }
+
+        async loadFromCache(id) {
+            const item = await this.cache.get(id);
+            if (item) {
+                const img = new Image();
+                img.onload = () => {
+                    this.canvas.width = img.width;
+                    this.canvas.height = img.height;
+                    this.ctx.drawImage(img, 0, 0);
+                    this.showCanvas();
+                    this.enableDownload();
+                    this.log(`Loaded from cache: ${item.name}`, 'success');
+                };
+                img.src = item.imageData;
+            }
+        }
+
+        async deleteFromCache(id) {
+            await this.cache.delete(id);
+            this.loadCache();
+            this.toast('Deleted from cache', 'success');
+        }
+
+        async clearCache() {
+            await this.cache.clear();
+            this.loadCache();
+            this.toast('Cache cleared', 'success');
+        }
+
+        // Mining
+        async startMining() {
+            if (miningActive) return;
+            miningActive = true;
+
+            this.log('Mining started', 'info');
+
+            const mineLoop = async () => {
+                if (!miningActive) return;
+
+                const blockData = {
+                    height: this.miner.blockHeight,
+                    prevHash: this.miner.lastBlock?.hash || '0'.repeat(64),
+                    timestamp: Date.now(),
+                    data: `Block ${this.miner.blockHeight + 1}`
+                };
+
+                const result = await this.miner.mine(blockData);
+
+                if (result.found) {
+                    this.log(`Block ${this.miner.blockHeight} mined: ${result.hash.substring(0, 16)}...`, 'success');
+
+                    // Generate receipt image for mined block
+                    await this.generateMiningReceipt(this.miner.lastBlock);
+                }
+
+                this.updateMiningStats();
+
+                if (miningActive) {
+                    setTimeout(mineLoop, 100);
+                }
+            };
+
+            mineLoop();
+        }
+
+        stopMining() {
+            miningActive = false;
+            this.log('Mining stopped', 'info');
+        }
+
+        async generateMiningReceipt(block) {
+            // Create receipt image
+            this.canvas.width = 128;
+            this.canvas.height = 128;
+            this.generator.radial({ corridorId: block.height % L4 });
+
+            // Encode block data
+            const payload = JSON.stringify({
+                protocol: 'bloom:receipt:v1',
+                block: block.height,
+                hash: block.hash,
+                timestamp: block.timestamp
+            });
+
+            this.encoder.encode(payload, { lsbDepth: 2 });
+
+            // Auto-save to cache
+            const name = `Receipt-Block-${block.height}`;
+            const imageData = this.canvas.toDataURL('image/png');
+            await this.cache.save(name, imageData, { type: 'receipt', block });
+            this.loadCache();
+        }
+
+        updateMiningStats() {
+            document.getElementById('hashRate').textContent = this.miner.hashRate;
+            document.getElementById('totalHashes').textContent = this.miner.totalHashes;
+            document.getElementById('blockHeight').textContent = this.miner.blockHeight;
+            document.getElementById('difficulty').textContent = this.miner.difficulty;
+        }
+
+        updateProgress(percent, text) {
+            document.getElementById('progressFill').style.width = `${percent}%`;
+            document.getElementById('progressText').textContent = text;
+        }
+
+        updateStats() {
+            document.getElementById('blocksGenerated').textContent = blocksGenerated;
+            const capacity = this.canvas.width && this.canvas.height
+                ? Math.floor((this.canvas.width * this.canvas.height * 8) / 8)
+                : '--';
+            document.getElementById('currentCapacity').textContent =
+                capacity !== '--' ? `${capacity}B` : '--';
+        }
+
+        log(message, type = 'info') {
+            const log = document.getElementById('outputLog');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="time">[${time}]</span> ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        toast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => toast.remove(), 3000);
+        }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+        window.ui = new UIController();
+    });
+    </script>
+</body>
+</html>
