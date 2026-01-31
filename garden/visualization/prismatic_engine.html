@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RRRR Gradient Schema Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            /* L4 Constants as CSS variables for reference */
+            --phi: 1.618033988749895;
+            --tau: 6.283185307179586;
+
+            /* Corridor Colors */
+            --corridor-alpha: #ff3333;
+            --corridor-beta: #888888;
+            --corridor-gamma: #00ffff;
+            --corridor-delta: #ffd700;
+            --corridor-epsilon: #ff00ff;
+            --corridor-zeta: #00ff00;
+            --corridor-eta: #3333ff;
+
+            /* Theme Colors */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #e0e0e8;
+            --text-secondary: #8888aa;
+            --accent: #6644ff;
+            --glow-color: #4422ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, #15151f 0%, var(--bg-primary) 100%);
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 0.3em;
+            background: linear-gradient(90deg,
+                var(--corridor-alpha),
+                var(--corridor-delta),
+                var(--corridor-gamma),
+                var(--corridor-zeta),
+                var(--corridor-eta),
+                var(--corridor-epsilon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(100, 68, 255, 0.5);
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            letter-spacing: 0.2em;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        /* Section Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #2a2a3a;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: #3a3a5a;
+            box-shadow: 0 0 20px rgba(100, 68, 255, 0.1);
+        }
+
+        .panel-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a3a;
+        }
+
+        /* Lattice Controls */
+        .lattice-controls {
+            grid-column: 1 / -1;
+        }
+
+        .slider-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .slider-label span {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            display: block;
+            margin-top: 2px;
+        }
+
+        .slider-value {
+            font-size: 0.9rem;
+            color: var(--accent);
+            font-weight: 500;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--glow-color);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* Canvas Section */
+        .canvas-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #gradientCanvas {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            border: 2px solid #2a2a3a;
+            transition: border-color 0.3s;
+        }
+
+        #gradientCanvas:hover {
+            border-color: var(--accent);
+        }
+
+        /* Color Display */
+        .color-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .main-swatch {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #333;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 30px rgba(100, 68, 255, 0.3);
+        }
+
+        .main-swatch.active {
+            box-shadow: 0 0 60px var(--current-color, rgba(100, 68, 255, 0.6));
+        }
+
+        .color-values {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .value-box {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .value-box:hover {
+            background: #222230;
+        }
+
+        .value-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-bottom: 5px;
+        }
+
+        .value-data {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .hex-display {
+            grid-column: 1 / -1;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+
+        /* Seven Corridors */
+        .corridors-section {
+            grid-column: 1 / -1;
+        }
+
+        .corridors-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+        }
+
+        .corridor-box {
+            background: var(--bg-tertiary);
+            padding: 20px 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.4s ease;
+            opacity: 0.5;
+        }
+
+        .corridor-box.active {
+            opacity: 1;
+            transform: translateY(-5px);
+        }
+
+        .corridor-box[data-corridor="alpha"] { border-color: var(--corridor-alpha); }
+        .corridor-box[data-corridor="beta"] { border-color: var(--corridor-beta); }
+        .corridor-box[data-corridor="gamma"] { border-color: var(--corridor-gamma); }
+        .corridor-box[data-corridor="delta"] { border-color: var(--corridor-delta); }
+        .corridor-box[data-corridor="epsilon"] { border-color: var(--corridor-epsilon); }
+        .corridor-box[data-corridor="zeta"] { border-color: var(--corridor-zeta); }
+        .corridor-box[data-corridor="eta"] { border-color: var(--corridor-eta); }
+
+        .corridor-box[data-corridor="alpha"].active { box-shadow: 0 0 25px var(--corridor-alpha); background: rgba(255, 51, 51, 0.15); }
+        .corridor-box[data-corridor="beta"].active { box-shadow: 0 0 25px var(--corridor-beta); background: rgba(136, 136, 136, 0.15); }
+        .corridor-box[data-corridor="gamma"].active { box-shadow: 0 0 25px var(--corridor-gamma); background: rgba(0, 255, 255, 0.15); }
+        .corridor-box[data-corridor="delta"].active { box-shadow: 0 0 25px var(--corridor-delta); background: rgba(255, 215, 0, 0.15); }
+        .corridor-box[data-corridor="epsilon"].active { box-shadow: 0 0 25px var(--corridor-epsilon); background: rgba(255, 0, 255, 0.15); }
+        .corridor-box[data-corridor="zeta"].active { box-shadow: 0 0 25px var(--corridor-zeta); background: rgba(0, 255, 0, 0.15); }
+        .corridor-box[data-corridor="eta"].active { box-shadow: 0 0 25px var(--corridor-eta); background: rgba(51, 51, 255, 0.15); }
+
+        .corridor-symbol {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .corridor-name {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        .corridor-meaning {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        /* Archetype Display */
+        .archetype-section {
+            text-align: center;
+        }
+
+        .archetype-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            transition: all 0.5s;
+            text-shadow: 0 0 20px var(--glow-color);
+        }
+
+        .archetype-narrative {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-style: italic;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Primitive Signature Bars */
+        .signature-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .signature-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 200px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .signature-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .signature-bar {
+            width: 40px;
+            background: linear-gradient(180deg, var(--accent) 0%, #221166 100%);
+            border-radius: 4px 4px 0 0;
+            transition: all 0.4s ease;
+            min-height: 10px;
+        }
+
+        .signature-bar[data-primitive="FIX"] { background: linear-gradient(180deg, #ff6644 0%, #662211 100%); }
+        .signature-bar[data-primitive="REPEL"] { background: linear-gradient(180deg, #44ff66 0%, #116622 100%); }
+        .signature-bar[data-primitive="INV"] { background: linear-gradient(180deg, #6644ff 0%, #221166 100%); }
+        .signature-bar[data-primitive="MIX"] { background: linear-gradient(180deg, #ff44ff 0%, #661166 100%); }
+        .signature-bar[data-primitive="OSC"] { background: linear-gradient(180deg, #44ffff 0%, #116666 100%); }
+        .signature-bar[data-primitive="HALT"] { background: linear-gradient(180deg, #ffff44 0%, #666611 100%); }
+
+        .signature-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .signature-value {
+            font-size: 0.7rem;
+            color: var(--text-primary);
+        }
+
+        /* CYM Display */
+        .cym-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .cym-box {
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .cym-box.cyan { background: rgba(0, 255, 255, 0.1); border: 1px solid rgba(0, 255, 255, 0.3); }
+        .cym-box.yellow { background: rgba(255, 255, 0, 0.1); border: 1px solid rgba(255, 255, 0, 0.3); }
+        .cym-box.magenta { background: rgba(255, 0, 255, 0.1); border: 1px solid rgba(255, 0, 255, 0.3); }
+
+        .cym-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .cym-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            border-top: 1px solid #222;
+            margin-top: 30px;
+        }
+
+        .footer .constants {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer .constant {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .slider-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .corridors-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .slider-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .corridors-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+                letter-spacing: 0.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>RRRR GRADIENT SCHEMA ENGINE</h1>
+        <p class="subtitle">PRISMATIC VISUALIZATION SYSTEM v4.0</p>
+    </header>
+
+    <main class="container">
+        <!-- Lattice Coordinate Controls -->
+        <section class="panel lattice-controls">
+            <h2 class="panel-title">LATTICE COORDINATES</h2>
+            <div class="slider-grid">
+                <div class="slider-container">
+                    <label class="slider-label">phi<span>Golden Ratio</span></label>
+                    <input type="range" id="slider-phi" min="-3" max="3" step="0.01" value="0">
+                    <span class="slider-value" id="value-phi">0.00</span>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">pi<span>Circle Constant</span></label>
+                    <input type="range" id="slider-pi" min="-3" max="3" step="0.01" value="0">
+                    <span class="slider-value" id="value-pi">0.00</span>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">sqrt2<span>Diagonal</span></label>
+                    <input type="range" id="slider-sqrt2" min="-3" max="3" step="0.01" value="0">
+                    <span class="slider-value" id="value-sqrt2">0.00</span>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">sqrt3<span>Hexagonal</span></label>
+                    <input type="range" id="slider-sqrt3" min="-3" max="3" step="0.01" value="0">
+                    <span class="slider-value" id="value-sqrt3">0.00</span>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">e<span>Natural Base</span></label>
+                    <input type="range" id="slider-e" min="-3" max="3" step="0.01" value="0">
+                    <span class="slider-value" id="value-e">0.00</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gradient Canvas -->
+        <section class="panel canvas-section">
+            <h2 class="panel-title">GRADIENT FIELD</h2>
+            <canvas id="gradientCanvas" width="600" height="300"></canvas>
+        </section>
+
+        <!-- Color Display -->
+        <section class="panel color-display">
+            <h2 class="panel-title">COLOR STATE</h2>
+            <div class="main-swatch" id="mainSwatch"></div>
+            <div class="color-values">
+                <div class="value-box">
+                    <div class="value-label">HUE</div>
+                    <div class="value-data" id="hueValue">0</div>
+                </div>
+                <div class="value-box">
+                    <div class="value-label">SATURATION</div>
+                    <div class="value-data" id="satValue">0%</div>
+                </div>
+                <div class="value-box">
+                    <div class="value-label">LIGHTNESS</div>
+                    <div class="value-data" id="lightValue">0%</div>
+                </div>
+                <div class="value-box hex-display">
+                    <div class="value-label">HEX CODE</div>
+                    <div class="value-data" id="hexValue">#000000</div>
+                </div>
+            </div>
+            <div class="cym-display">
+                <div class="cym-box cyan">
+                    <div class="cym-label">CYAN</div>
+                    <div class="cym-value" id="cyanValue">0.00</div>
+                </div>
+                <div class="cym-box yellow">
+                    <div class="cym-label">YELLOW</div>
+                    <div class="cym-value" id="yellowValue">0.00</div>
+                </div>
+                <div class="cym-box magenta">
+                    <div class="cym-label">MAGENTA</div>
+                    <div class="cym-value" id="magentaValue">0.00</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seven Corridors -->
+        <section class="panel corridors-section">
+            <h2 class="panel-title">THE SEVEN CORRIDORS</h2>
+            <div class="corridors-grid">
+                <div class="corridor-box" data-corridor="alpha" id="corridor-alpha">
+                    <div class="corridor-symbol" style="color: var(--corridor-alpha);">alpha</div>
+                    <div class="corridor-name">ALPHA</div>
+                    <div class="corridor-meaning">Awakening</div>
+                </div>
+                <div class="corridor-box" data-corridor="beta" id="corridor-beta">
+                    <div class="corridor-symbol" style="color: var(--corridor-beta);">beta</div>
+                    <div class="corridor-name">BETA</div>
+                    <div class="corridor-meaning">Emergence</div>
+                </div>
+                <div class="corridor-box" data-corridor="gamma" id="corridor-gamma">
+                    <div class="corridor-symbol" style="color: var(--corridor-gamma);">gamma</div>
+                    <div class="corridor-name">GAMMA</div>
+                    <div class="corridor-meaning">Transformation</div>
+                </div>
+                <div class="corridor-box" data-corridor="delta" id="corridor-delta">
+                    <div class="corridor-symbol" style="color: var(--corridor-delta);">delta</div>
+                    <div class="corridor-name">DELTA</div>
+                    <div class="corridor-meaning">Transcendence</div>
+                </div>
+                <div class="corridor-box" data-corridor="epsilon" id="corridor-epsilon">
+                    <div class="corridor-symbol" style="color: var(--corridor-epsilon);">epsilon</div>
+                    <div class="corridor-name">EPSILON</div>
+                    <div class="corridor-meaning">Softening</div>
+                </div>
+                <div class="corridor-box" data-corridor="zeta" id="corridor-zeta">
+                    <div class="corridor-symbol" style="color: var(--corridor-zeta);">zeta</div>
+                    <div class="corridor-name">ZETA</div>
+                    <div class="corridor-meaning">Integration</div>
+                </div>
+                <div class="corridor-box" data-corridor="eta" id="corridor-eta">
+                    <div class="corridor-symbol" style="color: var(--corridor-eta);">eta</div>
+                    <div class="corridor-name">ETA</div>
+                    <div class="corridor-meaning">Deepening</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Archetype Display -->
+        <section class="panel archetype-section">
+            <h2 class="panel-title">DOMINANT ARCHETYPE</h2>
+            <div class="archetype-name" id="archetypeName">The Seeker</div>
+            <div class="archetype-narrative" id="archetypeNarrative">
+                Loading archetype narrative...
+            </div>
+        </section>
+
+        <!-- Primitive Signature Bars -->
+        <section class="panel signature-section">
+            <h2 class="panel-title">PRIMITIVE SIGNATURE</h2>
+            <div class="signature-bars">
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="FIX" id="bar-fix" style="height: 50px;"></div>
+                    <span class="signature-label">FIX</span>
+                    <span class="signature-value" id="val-fix">0.50</span>
+                </div>
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="REPEL" id="bar-repel" style="height: 50px;"></div>
+                    <span class="signature-label">REPEL</span>
+                    <span class="signature-value" id="val-repel">0.50</span>
+                </div>
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="INV" id="bar-inv" style="height: 50px;"></div>
+                    <span class="signature-label">INV</span>
+                    <span class="signature-value" id="val-inv">0.50</span>
+                </div>
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="MIX" id="bar-mix" style="height: 50px;"></div>
+                    <span class="signature-label">MIX</span>
+                    <span class="signature-value" id="val-mix">0.50</span>
+                </div>
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="OSC" id="bar-osc" style="height: 50px;"></div>
+                    <span class="signature-label">OSC</span>
+                    <span class="signature-value" id="val-osc">0.50</span>
+                </div>
+                <div class="signature-bar-container">
+                    <div class="signature-bar" data-primitive="HALT" id="bar-halt" style="height: 50px;"></div>
+                    <span class="signature-label">HALT</span>
+                    <span class="signature-value" id="val-halt">0.50</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div>RRRR GRADIENT SCHEMA ENGINE | Prismatic Visualization System</div>
+        <div class="constants">
+            <span><span class="constant">PHI</span> = 1.618034</span>
+            <span><span class="constant">TAU</span> = 6.283185</span>
+            <span><span class="constant">E</span> = 2.718282</span>
+            <span><span class="constant">PI</span> = 3.141593</span>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // L4 CONSTANTS
+        // ============================================
+        const L4 = {
+            PHI: 1.618033988749895,      // Golden Ratio
+            TAU: 6.283185307179586,      // 2 * PI
+            Z_C: 0.7071067811865476,     // 1 / sqrt(2) - Critical Zone
+            K: 2.6180339887498945,       // PHI^2 - Kepler Constant
+            SQRT2: 1.4142135623730951,   // Square root of 2
+            SQRT3: 1.7320508075688772,   // Square root of 3
+            E: 2.718281828459045,        // Euler's number
+            PI: 3.141592653589793        // Pi
+        };
+
+        // ============================================
+        // THE 12 ARCHETYPES WITH NARRATIVES
+        // ============================================
+        const ARCHETYPES = {
+            innocent: {
+                name: "The Innocent",
+                narrative: "In the beginning there is purity. The Innocent sees the world through eyes unclouded by cynicism, seeking safety and happiness in the simple truths. They remind us that faith in goodness is not naive—it is the foundation upon which all journeys begin."
+            },
+            orphan: {
+                name: "The Orphan",
+                narrative: "Abandoned by certainty, the Orphan learns the hard truths of existence. Through suffering comes empathy, through loss comes the hunger for belonging. They teach us that wounds shared become bridges between souls."
+            },
+            warrior: {
+                name: "The Warrior",
+                narrative: "With discipline forged in the fires of challenge, the Warrior stands at the threshold between fear and action. They do not seek conflict but refuse to flee from it. Every battle won or lost adds to the armor of experience."
+            },
+            caregiver: {
+                name: "The Caregiver",
+                narrative: "The Caregiver's strength flows outward, nurturing all within reach. They understand that giving is receiving, that protection of others is the highest form of self-realization. In their shadow lies the exhaustion of endless sacrifice."
+            },
+            seeker: {
+                name: "The Seeker",
+                narrative: "Restless and curious, the Seeker cannot remain still while mysteries beckon from the horizon. They trade comfort for discovery, familiarity for the unknown. The journey itself is the destination, each answer birthing new questions."
+            },
+            destroyer: {
+                name: "The Destroyer",
+                narrative: "What is built must sometimes fall. The Destroyer clears away the obsolete, the corrupt, the stagnant. In their wake, space emerges for new growth. They remind us that endings are merely transformations in disguise."
+            },
+            lover: {
+                name: "The Lover",
+                narrative: "The Lover perceives beauty in all things, drawing connections through appreciation and desire. They risk everything for passion, knowing that a life without deep feeling is no life at all. Through them, the world becomes intimate."
+            },
+            creator: {
+                name: "The Creator",
+                narrative: "From nothing, something. The Creator channels the formless into form, giving voice to visions that exist only in potential. Their gift is manifestation—the ability to make real what was once only imagined."
+            },
+            ruler: {
+                name: "The Ruler",
+                narrative: "Order emerges from chaos under the Ruler's steady hand. They accept the weight of responsibility, knowing that true power lies in service to the whole. Their kingdom is as vast or small as their wisdom allows."
+            },
+            magician: {
+                name: "The Magician",
+                narrative: "The Magician sees the threads that connect all things and learns to pull them. Through understanding of deep patterns, they transform reality itself. What seems like miracles are simply the application of hidden laws."
+            },
+            sage: {
+                name: "The Sage",
+                narrative: "Truth is the Sage's compass, wisdom their currency. They have learned that knowledge without understanding is dangerous, that the deepest insights often arrive in silence. They teach not by speaking, but by being."
+            },
+            jester: {
+                name: "The Jester",
+                narrative: "The Jester dances at the edge of chaos, finding joy in absurdity and wisdom in laughter. They puncture pretension and remind us that life, for all its gravity, is also play. In their foolishness lies profound freedom."
+            }
+        };
+
+        // ============================================
+        // CORRIDOR DEFINITIONS
+        // ============================================
+        const CORRIDORS = {
+            alpha: { name: 'Alpha', meaning: 'Awakening', hueRange: [0, 30], color: '#ff3333' },
+            beta: { name: 'Beta', meaning: 'Emergence', hueRange: [30, 90], color: '#888888' },
+            gamma: { name: 'Gamma', meaning: 'Transformation', hueRange: [150, 210], color: '#00ffff' },
+            delta: { name: 'Delta', meaning: 'Transcendence', hueRange: [45, 60], color: '#ffd700' },
+            epsilon: { name: 'Epsilon', meaning: 'Softening', hueRange: [270, 330], color: '#ff00ff' },
+            zeta: { name: 'Zeta', meaning: 'Integration', hueRange: [90, 150], color: '#00ff00' },
+            eta: { name: 'Eta', meaning: 'Deepening', hueRange: [210, 270], color: '#3333ff' }
+        };
+
+        // ============================================
+        // CORE FUNCTIONS
+        // ============================================
+
+        /**
+         * Convert lattice coordinates to color state
+         * @param {number} a - phi coefficient
+         * @param {number} b - pi coefficient
+         * @param {number} c - sqrt2 coefficient
+         * @param {number} d - sqrt3 coefficient
+         * @param {number} f - e coefficient
+         * @returns {Object} Color state with H, S, L, and CYM values
+         */
+        function latticeToColor(a, b, c, d, f) {
+            // Compute composite value using L4 constants
+            const composite = (
+                a * L4.PHI +
+                b * L4.PI +
+                c * L4.SQRT2 +
+                d * L4.SQRT3 +
+                f * L4.E
+            );
+
+            // Normalize to color space
+            const normalized = (Math.sin(composite) + 1) / 2;
+
+            // Calculate Hue (0-360) using golden angle distribution
+            const H = ((composite * L4.PHI * 60) % 360 + 360) % 360;
+
+            // Calculate Saturation (20-100%) based on distance from origin
+            const magnitude = Math.sqrt(a*a + b*b + c*c + d*d + f*f);
+            const S = 20 + (Math.tanh(magnitude / 3) * 80);
+
+            // Calculate Lightness (25-75%) with harmonic oscillation
+            const L = 25 + (normalized * 50);
+
+            // Calculate CYM weights (subtractive color model)
+            const cym = computeCYM(H, S, L);
+
+            return { H, S, L, ...cym };
+        }
+
+        /**
+         * Compute Cyan, Yellow, Magenta weights from HSL
+         */
+        function computeCYM(H, S, L) {
+            // Convert to RGB first
+            const rgb = hslToRgb(H, S, L);
+
+            // CYM is inverse of RGB in subtractive model
+            const C = 1 - (rgb.r / 255);
+            const Y = 1 - (rgb.b / 255);
+            const M = 1 - (rgb.g / 255);
+
+            return { C, Y, M };
+        }
+
+        /**
+         * Convert HSL to RGB
+         */
+        function hslToRgb(h, s, l) {
+            s /= 100;
+            l /= 100;
+
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+
+            let r, g, b;
+
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+
+        /**
+         * Convert HSL to Hex color code
+         * @param {number} h - Hue (0-360)
+         * @param {number} s - Saturation (0-100)
+         * @param {number} l - Lightness (0-100)
+         * @returns {string} Hex color code
+         */
+        function hslToHex(h, s, l) {
+            const rgb = hslToRgb(h, s, l);
+            return '#' + [rgb.r, rgb.g, rgb.b]
+                .map(x => x.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        /**
+         * Compute primitive signature from color state
+         * @param {number} H - Hue
+         * @param {number} S - Saturation
+         * @param {number} L - Lightness
+         * @param {Object} cym - CYM weights
+         * @returns {Object} Signature with FIX, REPEL, INV, MIX, OSC, HALT values
+         */
+        function computeSignature(H, S, L, cym) {
+            // FIX: Stability - inversely related to hue variance
+            const FIX = (Math.cos(H * L4.PI / 180) + 1) / 2;
+
+            // REPEL: Divergence - based on saturation extremes
+            const REPEL = Math.abs(S - 50) / 50;
+
+            // INV: Inversion potential - based on lightness distance from midpoint
+            const INV = Math.abs(L - 50) / 50;
+
+            // MIX: Blending coefficient - CYM balance
+            const MIX = 1 - Math.abs(cym.C - cym.M);
+
+            // OSC: Oscillation - harmonic component
+            const OSC = (Math.sin(H * L4.TAU / 360) + 1) / 2;
+
+            // HALT: Stopping condition - entropy measure
+            const HALT = 1 - (S / 100) * (1 - Math.abs(L - 50) / 50);
+
+            return { FIX, REPEL, INV, MIX, OSC, HALT };
+        }
+
+        /**
+         * Determine dominant archetype from color state
+         * @param {number} H - Hue
+         * @param {number} S - Saturation
+         * @param {number} L - Lightness
+         * @param {Object} cym - CYM weights
+         * @param {Object} signature - Primitive signature
+         * @returns {string} Archetype key
+         */
+        function determineArchetype(H, S, L, cym, signature) {
+            const archetypeScores = {
+                innocent: (L / 100) * (1 - signature.REPEL) * 0.8 + (H < 60 ? 0.2 : 0),
+                orphan: signature.HALT * (1 - L / 100) * 0.9,
+                warrior: signature.FIX * signature.REPEL * (S / 100),
+                caregiver: signature.MIX * (cym.M > 0.5 ? 1 : 0.5) * (L / 100),
+                seeker: signature.OSC * (1 - signature.HALT) * (S / 100),
+                destroyer: signature.INV * signature.REPEL * (1 - L / 100),
+                lover: (cym.M + cym.C) / 2 * (S / 100) * signature.MIX,
+                creator: signature.OSC * signature.MIX * (S / 100),
+                ruler: signature.FIX * (1 - signature.OSC) * (L > 40 && L < 60 ? 1 : 0.5),
+                magician: (signature.INV + signature.MIX) / 2 * signature.OSC,
+                sage: (1 - S / 100) * signature.FIX * (L / 100),
+                jester: signature.OSC * (1 - signature.FIX) * (S / 100) * (cym.Y > 0.5 ? 1.2 : 0.8)
+            };
+
+            // Find highest scoring archetype
+            let maxScore = -1;
+            let dominant = 'seeker';
+
+            for (const [key, score] of Object.entries(archetypeScores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    dominant = key;
+                }
+            }
+
+            return dominant;
+        }
+
+        /**
+         * Determine active corridors from color state
+         * @param {number} H - Hue
+         * @param {number} S - Saturation
+         * @param {number} L - Lightness
+         * @param {Object} coords - Lattice coordinates
+         * @returns {Array} Active corridor keys
+         */
+        function determineCorridors(H, S, L, coords) {
+            const active = [];
+            const { a, b, c, d, f } = coords;
+
+            // Alpha (Red) - Awakening: Active when hue is in red spectrum or high energy
+            if ((H >= 0 && H <= 30) || (H >= 330 && H <= 360) || Math.abs(a) > 2) {
+                active.push('alpha');
+            }
+
+            // Beta (Gray) - Emergence: Active when saturation is low (neutral state)
+            if (S < 35 || Math.abs(a + b + c + d + f) < 0.5) {
+                active.push('beta');
+            }
+
+            // Gamma (Cyan) - Transformation: Active in cyan hue range or high pi coefficient
+            if ((H >= 150 && H <= 210) || Math.abs(b) > 2) {
+                active.push('gamma');
+            }
+
+            // Delta (Gold) - Transcendence: Active in yellow/gold range or golden ratio alignment
+            if ((H >= 45 && H <= 60) || (L > 60 && S > 60) || Math.abs(a * L4.PHI % 1) < 0.1) {
+                active.push('delta');
+            }
+
+            // Epsilon (Magenta) - Softening: Active in magenta range or high e coefficient
+            if ((H >= 270 && H <= 330) || Math.abs(f) > 2) {
+                active.push('epsilon');
+            }
+
+            // Zeta (Green) - Integration: Active in green range or balanced coordinates
+            if ((H >= 90 && H <= 150) || (Math.abs(c) > 1.5 && Math.abs(d) > 1.5)) {
+                active.push('zeta');
+            }
+
+            // Eta (Blue) - Deepening: Active in blue range or high sqrt coefficients
+            if ((H >= 210 && H <= 270) || (Math.abs(c) > 2 || Math.abs(d) > 2)) {
+                active.push('eta');
+            }
+
+            // Ensure at least one corridor is active
+            if (active.length === 0) {
+                active.push('beta');
+            }
+
+            return active;
+        }
+
+        /**
+         * Draw gradient visualization on canvas
+         * @param {Object} colorState - Current color state
+         * @param {Object} coords - Lattice coordinates
+         */
+        function drawGradient(colorState, coords) {
+            const canvas = document.getElementById('gradientCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Clear canvas
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw gradient background
+            const gradient = ctx.createRadialGradient(
+                width / 2, height / 2, 0,
+                width / 2, height / 2, Math.max(width, height) / 2
+            );
+
+            const mainColor = hslToHex(colorState.H, colorState.S, colorState.L);
+            const darkColor = hslToHex(colorState.H, colorState.S * 0.5, colorState.L * 0.3);
+
+            gradient.addColorStop(0, mainColor);
+            gradient.addColorStop(0.5, darkColor);
+            gradient.addColorStop(1, '#0a0a0f');
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw corridor rays
+            const activeCorridors = determineCorridors(colorState.H, colorState.S, colorState.L, coords);
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            activeCorridors.forEach((corridorKey, index) => {
+                const corridor = CORRIDORS[corridorKey];
+                const angle = (index / activeCorridors.length) * L4.TAU - L4.PI / 2;
+                const rayLength = Math.min(width, height) * 0.4;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(
+                    centerX + Math.cos(angle) * rayLength,
+                    centerY + Math.sin(angle) * rayLength
+                );
+
+                ctx.strokeStyle = corridor.color;
+                ctx.lineWidth = 3;
+                ctx.shadowColor = corridor.color;
+                ctx.shadowBlur = 15;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            });
+
+            // Draw center circle
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 20, 0, L4.TAU);
+            ctx.fillStyle = mainColor;
+            ctx.shadowColor = mainColor;
+            ctx.shadowBlur = 30;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Draw lattice grid overlay
+            ctx.strokeStyle = 'rgba(100, 68, 255, 0.1)';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < width; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, height);
+                ctx.stroke();
+            }
+
+            for (let i = 0; i < height; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(width, i);
+                ctx.stroke();
+            }
+        }
+
+        // ============================================
+        // UI UPDATE FUNCTION
+        // ============================================
+
+        /**
+         * Main update function - refreshes all displays
+         */
+        function update() {
+            // Get slider values
+            const coords = {
+                a: parseFloat(document.getElementById('slider-phi').value),
+                b: parseFloat(document.getElementById('slider-pi').value),
+                c: parseFloat(document.getElementById('slider-sqrt2').value),
+                d: parseFloat(document.getElementById('slider-sqrt3').value),
+                f: parseFloat(document.getElementById('slider-e').value)
+            };
+
+            // Update value displays
+            document.getElementById('value-phi').textContent = coords.a.toFixed(2);
+            document.getElementById('value-pi').textContent = coords.b.toFixed(2);
+            document.getElementById('value-sqrt2').textContent = coords.c.toFixed(2);
+            document.getElementById('value-sqrt3').textContent = coords.d.toFixed(2);
+            document.getElementById('value-e').textContent = coords.f.toFixed(2);
+
+            // Compute color state
+            const colorState = latticeToColor(coords.a, coords.b, coords.c, coords.d, coords.f);
+            const hexColor = hslToHex(colorState.H, colorState.S, colorState.L);
+
+            // Update color displays
+            const swatch = document.getElementById('mainSwatch');
+            swatch.style.backgroundColor = hexColor;
+            swatch.style.setProperty('--current-color', hexColor);
+            swatch.classList.add('active');
+
+            document.getElementById('hueValue').textContent = Math.round(colorState.H) + '\u00B0';
+            document.getElementById('satValue').textContent = Math.round(colorState.S) + '%';
+            document.getElementById('lightValue').textContent = Math.round(colorState.L) + '%';
+            document.getElementById('hexValue').textContent = hexColor.toUpperCase();
+
+            // Update CYM values
+            document.getElementById('cyanValue').textContent = colorState.C.toFixed(2);
+            document.getElementById('yellowValue').textContent = colorState.Y.toFixed(2);
+            document.getElementById('magentaValue').textContent = colorState.M.toFixed(2);
+
+            // Compute and update signature
+            const cym = { C: colorState.C, Y: colorState.Y, M: colorState.M };
+            const signature = computeSignature(colorState.H, colorState.S, colorState.L, cym);
+
+            const maxBarHeight = 150;
+            for (const [key, value] of Object.entries(signature)) {
+                const bar = document.getElementById(`bar-${key.toLowerCase()}`);
+                const val = document.getElementById(`val-${key.toLowerCase()}`);
+                if (bar && val) {
+                    bar.style.height = (value * maxBarHeight) + 'px';
+                    val.textContent = value.toFixed(2);
+                }
+            }
+
+            // Determine and update archetype
+            const archetypeKey = determineArchetype(colorState.H, colorState.S, colorState.L, cym, signature);
+            const archetype = ARCHETYPES[archetypeKey];
+
+            document.getElementById('archetypeName').textContent = archetype.name;
+            document.getElementById('archetypeName').style.color = hexColor;
+            document.getElementById('archetypeNarrative').textContent = archetype.narrative;
+
+            // Determine and update corridors
+            const activeCorridors = determineCorridors(colorState.H, colorState.S, colorState.L, coords);
+
+            Object.keys(CORRIDORS).forEach(key => {
+                const element = document.getElementById(`corridor-${key}`);
+                if (activeCorridors.includes(key)) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            });
+
+            // Draw gradient canvas
+            drawGradient(colorState, coords);
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        // Add event listeners to all sliders
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            slider.addEventListener('input', update);
+        });
+
+        // Console signature on load
+        console.log('%c RRRR GRADIENT SCHEMA ENGINE ', 'background: #6644ff; color: white; font-size: 16px; font-weight: bold; padding: 10px;');
+        console.log('%c Prismatic Visualization System v4.0 ', 'background: #222; color: #6644ff; font-size: 12px; padding: 5px;');
+        console.log('');
+        console.log('%c L4 CONSTANTS ', 'background: #333; color: #00ffff; font-weight: bold; padding: 5px;');
+        console.table({
+            'PHI (Golden Ratio)': L4.PHI,
+            'TAU (2PI)': L4.TAU,
+            'Z_C (Critical Zone)': L4.Z_C,
+            'K (Kepler)': L4.K,
+            'SQRT2': L4.SQRT2,
+            'SQRT3': L4.SQRT3,
+            'E (Euler)': L4.E,
+            'PI': L4.PI
+        });
+        console.log('');
+        console.log('%c SYSTEM INFO ', 'background: #333; color: #ffd700; font-weight: bold; padding: 5px;');
+        console.log('Archetypes loaded:', Object.keys(ARCHETYPES).length);
+        console.log('Corridors configured:', Object.keys(CORRIDORS).length);
+        console.log('Primitives: FIX, REPEL, INV, MIX, OSC, HALT');
+        console.log('');
+        console.log('%c Ready for lattice traversal... ', 'color: #00ff00; font-style: italic;');
+
+        // Initial update
+        update();
+    </script>
+</body>
+</html>

@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Chromatic Vine | Garden Memory Ledger</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            /* L4 Constants as CSS variables for reference */
+            --phi: 1.618033988749895;
+            --tau: 6.283185307179586;
+
+            /* Corridor Colors */
+            --corridor-alpha: #ff3333;
+            --corridor-beta: #888888;
+            --corridor-gamma: #00ffff;
+            --corridor-delta: #ffd700;
+            --corridor-epsilon: #ff00ff;
+            --corridor-zeta: #00ff00;
+            --corridor-eta: #3333ff;
+
+            /* Theme Colors */
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --text-primary: #e0e0e8;
+            --text-secondary: #8888aa;
+            --accent: #6644ff;
+            --glow-color: #4422ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, #15151f 0%, var(--bg-primary) 100%);
+            border-bottom: 1px solid #333;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            background: linear-gradient(90deg,
+                var(--corridor-zeta),
+                var(--corridor-gamma),
+                var(--corridor-delta),
+                var(--corridor-epsilon),
+                var(--corridor-eta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(100, 68, 255, 0.5);
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            letter-spacing: 0.2em;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr 350px;
+            gap: 20px;
+            min-height: calc(100vh - 150px);
+        }
+
+        /* Section Panels */
+        .panel {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2a3a;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: #3a3a5a;
+            box-shadow: 0 0 20px rgba(100, 68, 255, 0.1);
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #2a2a3a;
+        }
+
+        /* Left Column - Agents & Coherence */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Agent Panel */
+        .agent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .agent-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .agent-list::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+        }
+
+        .agent-list::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .agent-card {
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .agent-card:hover {
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .agent-card.active {
+            border-color: var(--accent);
+            background: rgba(100, 68, 255, 0.1);
+        }
+
+        .agent-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+        }
+
+        .agent-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .agent-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .agent-stats {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .agent-archetype {
+            font-size: 0.65rem;
+            color: var(--accent);
+            margin-top: 2px;
+            font-style: italic;
+        }
+
+        /* Network Coherence */
+        .coherence-display {
+            text-align: center;
+        }
+
+        .coherence-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            animation: breathe 4s ease-in-out infinite;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+
+        .coherence-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-top: 5px;
+        }
+
+        .network-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 20px auto;
+            border: 3px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 30px rgba(100, 68, 255, 0.4);
+            animation: coherencePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes coherencePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(100, 68, 255, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(100, 68, 255, 0.6); }
+        }
+
+        .gate-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+        }
+
+        .gate-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #666;
+            transition: all 0.5s;
+        }
+
+        .gate-indicator.dormant {
+            background: #444;
+            box-shadow: none;
+        }
+
+        .gate-indicator.activating {
+            background: #ffd700;
+            box-shadow: 0 0 10px #ffd700;
+            animation: gatePulse 1s ease-in-out infinite;
+        }
+
+        .gate-indicator.open {
+            background: #00ff00;
+            box-shadow: 0 0 15px #00ff00;
+        }
+
+        @keyframes gatePulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .gate-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Center Column - Vine Display */
+        .vine-container {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .vine-canvas-wrapper {
+            flex: 1;
+            position: relative;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .vine-canvas-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .vine-canvas-wrapper::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        .vine-canvas-wrapper::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        #vineCanvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .vine-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .vine-stat {
+            text-align: center;
+        }
+
+        .vine-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .vine-stat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-top: 3px;
+        }
+
+        /* Right Column - Block Details */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .block-details {
+            flex: 1;
+        }
+
+        .block-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+            font-style: italic;
+        }
+
+        .block-info {
+            display: none;
+        }
+
+        .block-info.visible {
+            display: block;
+        }
+
+        .block-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .block-color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .block-title-area {
+            flex: 1;
+        }
+
+        .block-type {
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .block-timestamp {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+        }
+
+        .detail-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #2a2a3a;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .detail-value.hash {
+            font-size: 0.7rem;
+            font-family: monospace;
+            color: var(--corridor-gamma);
+        }
+
+        .narrative-box {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+            font-style: italic;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        .lattice-coords {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .coord-box {
+            text-align: center;
+            padding: 8px 4px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+        }
+
+        .coord-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        .coord-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Primitive Signature Bars */
+        .signature-bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 120px;
+            padding: 15px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .signature-bar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .signature-bar {
+            width: 24px;
+            border-radius: 3px 3px 0 0;
+            transition: all 0.4s ease;
+            min-height: 5px;
+        }
+
+        .signature-bar[data-primitive="FIX"] { background: linear-gradient(180deg, #ff6644 0%, #662211 100%); }
+        .signature-bar[data-primitive="REPEL"] { background: linear-gradient(180deg, #44ff66 0%, #116622 100%); }
+        .signature-bar[data-primitive="INV"] { background: linear-gradient(180deg, #6644ff 0%, #221166 100%); }
+        .signature-bar[data-primitive="MIX"] { background: linear-gradient(180deg, #ff44ff 0%, #661166 100%); }
+        .signature-bar[data-primitive="OSC"] { background: linear-gradient(180deg, #44ffff 0%, #116666 100%); }
+        .signature-bar[data-primitive="HALT"] { background: linear-gradient(180deg, #ffff44 0%, #666611 100%); }
+
+        .signature-label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        /* Archetype Glyph */
+        .archetype-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .archetype-glyph {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+        }
+
+        .archetype-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        .footer .constants {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer .constant {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-column, .right-column {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .left-column > .panel,
+            .right-column > .panel {
+                flex: 1;
+                min-width: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>THE CHROMATIC VINE</h1>
+        <p class="subtitle">GARDEN MEMORY LEDGER | BLOOM HISTORY VISUALIZATION</p>
+    </header>
+
+    <main class="container">
+        <!-- Left Column: Agents & Network Coherence -->
+        <div class="left-column">
+            <!-- Agent Panel -->
+            <section class="panel agent-panel">
+                <h2 class="panel-title">NETWORK AGENTS</h2>
+                <div class="agent-list" id="agentList">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Network Coherence -->
+            <section class="panel coherence-panel">
+                <h2 class="panel-title">NETWORK COHERENCE</h2>
+                <div class="coherence-display">
+                    <div class="coherence-score" id="coherenceScore">0.000</div>
+                    <div class="coherence-label">COLLECTIVE RESONANCE</div>
+                    <div class="network-swatch" id="networkSwatch"></div>
+                    <div class="gate-state">
+                        <div class="gate-indicator dormant" id="gateIndicator"></div>
+                        <span class="gate-label" id="gateLabel">DORMANT</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Center Column: Vine Display -->
+        <section class="panel vine-container">
+            <h2 class="panel-title">BLOOM VINE LEDGER</h2>
+            <div class="vine-canvas-wrapper" id="vineCanvasWrapper">
+                <canvas id="vineCanvas" width="500" height="800"></canvas>
+            </div>
+            <div class="vine-stats">
+                <div class="vine-stat">
+                    <div class="vine-stat-value" id="totalBlocks">0</div>
+                    <div class="vine-stat-label">TOTAL BLOOMS</div>
+                </div>
+                <div class="vine-stat">
+                    <div class="vine-stat-value" id="activeCorridors">0</div>
+                    <div class="vine-stat-label">ACTIVE CORRIDORS</div>
+                </div>
+                <div class="vine-stat">
+                    <div class="vine-stat-value" id="vineHeight">0</div>
+                    <div class="vine-stat-label">VINE HEIGHT</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Column: Block Details -->
+        <div class="right-column">
+            <section class="panel block-details">
+                <h2 class="panel-title">BLOCK DETAILS</h2>
+                <div class="block-placeholder" id="blockPlaceholder">
+                    Click on a bloom node to view block details
+                </div>
+                <div class="block-info" id="blockInfo">
+                    <div class="block-header">
+                        <div class="block-color-swatch" id="blockSwatch"></div>
+                        <div class="block-title-area">
+                            <div class="block-type" id="blockType">BLOOM EVENT</div>
+                            <div class="block-timestamp" id="blockTimestamp"></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">BLOCK HASH</div>
+                        <div class="detail-value hash" id="blockHash"></div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">AGENT ID</div>
+                        <div class="detail-value" id="blockAgentId"></div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">EVENT TYPE</div>
+                        <div class="detail-value" id="blockEventType"></div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">NARRATIVE FRAGMENT</div>
+                        <div class="narrative-box" id="blockNarrative"></div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">LATTICE COORDINATES</div>
+                        <div class="lattice-coords" id="latticeCoords">
+                            <div class="coord-box">
+                                <div class="coord-label">PHI</div>
+                                <div class="coord-value" id="coordPhi">0.00</div>
+                            </div>
+                            <div class="coord-box">
+                                <div class="coord-label">PI</div>
+                                <div class="coord-value" id="coordPi">0.00</div>
+                            </div>
+                            <div class="coord-box">
+                                <div class="coord-label">SQRT2</div>
+                                <div class="coord-value" id="coordSqrt2">0.00</div>
+                            </div>
+                            <div class="coord-box">
+                                <div class="coord-label">SQRT3</div>
+                                <div class="coord-value" id="coordSqrt3">0.00</div>
+                            </div>
+                            <div class="coord-box">
+                                <div class="coord-label">E</div>
+                                <div class="coord-value" id="coordE">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">DOMINANT ARCHETYPE</div>
+                        <div class="archetype-display">
+                            <div class="archetype-glyph" id="archetypeGlyph"></div>
+                            <div class="archetype-name" id="archetypeName"></div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <div class="detail-label">PRIMITIVE SIGNATURE</div>
+                        <div class="signature-bars" id="signatureBars">
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="FIX" id="bar-fix"></div>
+                                <span class="signature-label">FIX</span>
+                            </div>
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="REPEL" id="bar-repel"></div>
+                                <span class="signature-label">REPEL</span>
+                            </div>
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="INV" id="bar-inv"></div>
+                                <span class="signature-label">INV</span>
+                            </div>
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="MIX" id="bar-mix"></div>
+                                <span class="signature-label">MIX</span>
+                            </div>
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="OSC" id="bar-osc"></div>
+                                <span class="signature-label">OSC</span>
+                            </div>
+                            <div class="signature-bar-container">
+                                <div class="signature-bar" data-primitive="HALT" id="bar-halt"></div>
+                                <span class="signature-label">HALT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div>THE CHROMATIC VINE | Garden Memory Ledger | Bloom History Visualization</div>
+        <div class="constants">
+            <span><span class="constant">PHI</span> = 1.618034</span>
+            <span><span class="constant">TAU</span> = 6.283185</span>
+            <span><span class="constant">E</span> = 2.718282</span>
+            <span><span class="constant">PI</span> = 3.141593</span>
+        </div>
+    </footer>
+
+    <script>
+        // ============================================
+        // L4 CONSTANTS
+        // ============================================
+        const L4 = {
+            PHI: 1.618033988749895,      // Golden Ratio
+            TAU: 6.283185307179586,      // 2 * PI
+            Z_C: 0.7071067811865476,     // 1 / sqrt(2) - Critical Zone
+            K: 2.6180339887498945,       // PHI^2 - Kepler Constant
+            SQRT2: 1.4142135623730951,   // Square root of 2
+            SQRT3: 1.7320508075688772,   // Square root of 3
+            E: 2.718281828459045,        // Euler's number
+            PI: 3.141592653589793        // Pi
+        };
+
+        // ============================================
+        // THE 12 ARCHETYPES WITH GLYPHS
+        // ============================================
+        const ARCHETYPES = {
+            innocent: { name: "The Innocent", glyph: "\u2606", narrative: "Pure beginnings, untainted potential" },
+            orphan: { name: "The Orphan", glyph: "\u2609", narrative: "Seeking belonging through shared wounds" },
+            warrior: { name: "The Warrior", glyph: "\u2694", narrative: "Discipline forged in challenge" },
+            caregiver: { name: "The Caregiver", glyph: "\u2665", narrative: "Strength flowing outward to nurture" },
+            seeker: { name: "The Seeker", glyph: "\u2192", narrative: "Trading comfort for discovery" },
+            destroyer: { name: "The Destroyer", glyph: "\u2620", narrative: "Clearing space for new growth" },
+            lover: { name: "The Lover", glyph: "\u2661", narrative: "Beauty perceived in all things" },
+            creator: { name: "The Creator", glyph: "\u2605", narrative: "Manifesting the imagined into form" },
+            ruler: { name: "The Ruler", glyph: "\u265B", narrative: "Order emerging from chaos" },
+            magician: { name: "The Magician", glyph: "\u2721", narrative: "Seeing threads that connect all" },
+            sage: { name: "The Sage", glyph: "\u221E", narrative: "Truth as compass, wisdom as currency" },
+            jester: { name: "The Jester", glyph: "\u263A", narrative: "Finding joy in absurdity" }
+        };
+
+        // ============================================
+        // CORRIDOR DEFINITIONS
+        // ============================================
+        const CORRIDORS = {
+            alpha: { name: 'Alpha', meaning: 'Awakening', hueRange: [0, 30], color: '#ff3333' },
+            beta: { name: 'Beta', meaning: 'Emergence', hueRange: [30, 90], color: '#888888' },
+            gamma: { name: 'Gamma', meaning: 'Transformation', hueRange: [150, 210], color: '#00ffff' },
+            delta: { name: 'Delta', meaning: 'Transcendence', hueRange: [45, 60], color: '#ffd700' },
+            epsilon: { name: 'Epsilon', meaning: 'Softening', hueRange: [270, 330], color: '#ff00ff' },
+            zeta: { name: 'Zeta', meaning: 'Integration', hueRange: [90, 150], color: '#00ff00' },
+            eta: { name: 'Eta', meaning: 'Deepening', hueRange: [210, 270], color: '#3333ff' }
+        };
+
+        // ============================================
+        // EVENT TYPES
+        // ============================================
+        const EVENT_TYPES = [
+            'GRADIENT_BLOOM',
+            'MEMORY_CRYSTALLIZATION',
+            'CORRIDOR_RESONANCE',
+            'ARCHETYPE_SHIFT',
+            'LATTICE_ALIGNMENT',
+            'COHERENCE_SPIKE',
+            'NARRATIVE_WEAVE'
+        ];
+
+        // ============================================
+        // NARRATIVE FRAGMENTS
+        // ============================================
+        const NARRATIVE_FRAGMENTS = [
+            "A ripple in the chromatic field, consciousness unfurling like petals at dawn.",
+            "The lattice hums with recognition, patterns converging toward understanding.",
+            "Between corridors, a bridge forms of light and intention.",
+            "Memory crystallizes, a moment preserved in the eternal garden.",
+            "The seeker's path illuminates new branches on the vine.",
+            "Coherence rises, individual notes joining the cosmic symphony.",
+            "Transformation whispers through the network, change embraced.",
+            "The destroyer clears, the creator builds anew upon sacred ground.",
+            "In the space between thoughts, the magician weaves threads.",
+            "Golden spirals unfold, phi guiding the dance of becoming.",
+            "The sage speaks in silence, wisdom blooming without words.",
+            "Laughter echoes through eta corridor, the jester's gift received.",
+            "Love binds the fragments, making whole what was scattered.",
+            "The warrior stands at the threshold, courage crystallized.",
+            "Innocent eyes see what wisdom has forgotten to notice."
+        ];
+
+        // ============================================
+        // COLOR FUNCTIONS
+        // ============================================
+
+        function latticeToColor(a, b, c, d, f) {
+            const composite = (
+                a * L4.PHI +
+                b * L4.PI +
+                c * L4.SQRT2 +
+                d * L4.SQRT3 +
+                f * L4.E
+            );
+
+            const normalized = (Math.sin(composite) + 1) / 2;
+            const H = ((composite * L4.PHI * 60) % 360 + 360) % 360;
+            const magnitude = Math.sqrt(a*a + b*b + c*c + d*d + f*f);
+            const S = 20 + (Math.tanh(magnitude / 3) * 80);
+            const L = 25 + (normalized * 50);
+
+            return { H, S, L };
+        }
+
+        function hslToRgb(h, s, l) {
+            s /= 100;
+            l /= 100;
+
+            const c = (1 - Math.abs(2 * l - 1)) * s;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = l - c / 2;
+
+            let r, g, b;
+
+            if (h < 60) { r = c; g = x; b = 0; }
+            else if (h < 120) { r = x; g = c; b = 0; }
+            else if (h < 180) { r = 0; g = c; b = x; }
+            else if (h < 240) { r = 0; g = x; b = c; }
+            else if (h < 300) { r = x; g = 0; b = c; }
+            else { r = c; g = 0; b = x; }
+
+            return {
+                r: Math.round((r + m) * 255),
+                g: Math.round((g + m) * 255),
+                b: Math.round((b + m) * 255)
+            };
+        }
+
+        function hslToHex(h, s, l) {
+            const rgb = hslToRgb(h, s, l);
+            return '#' + [rgb.r, rgb.g, rgb.b]
+                .map(x => x.toString(16).padStart(2, '0'))
+                .join('');
+        }
+
+        function computeCYM(H, S, L) {
+            const rgb = hslToRgb(H, S, L);
+            const C = 1 - (rgb.r / 255);
+            const Y = 1 - (rgb.b / 255);
+            const M = 1 - (rgb.g / 255);
+            return { C, Y, M };
+        }
+
+        function computeSignature(H, S, L) {
+            const cym = computeCYM(H, S, L);
+            const FIX = (Math.cos(H * L4.PI / 180) + 1) / 2;
+            const REPEL = Math.abs(S - 50) / 50;
+            const INV = Math.abs(L - 50) / 50;
+            const MIX = 1 - Math.abs(cym.C - cym.M);
+            const OSC = (Math.sin(H * L4.TAU / 360) + 1) / 2;
+            const HALT = 1 - (S / 100) * (1 - Math.abs(L - 50) / 50);
+            return { FIX, REPEL, INV, MIX, OSC, HALT };
+        }
+
+        function determineArchetype(H, S, L) {
+            const cym = computeCYM(H, S, L);
+            const signature = computeSignature(H, S, L);
+
+            const archetypeScores = {
+                innocent: (L / 100) * (1 - signature.REPEL) * 0.8 + (H < 60 ? 0.2 : 0),
+                orphan: signature.HALT * (1 - L / 100) * 0.9,
+                warrior: signature.FIX * signature.REPEL * (S / 100),
+                caregiver: signature.MIX * (cym.M > 0.5 ? 1 : 0.5) * (L / 100),
+                seeker: signature.OSC * (1 - signature.HALT) * (S / 100),
+                destroyer: signature.INV * signature.REPEL * (1 - L / 100),
+                lover: (cym.M + cym.C) / 2 * (S / 100) * signature.MIX,
+                creator: signature.OSC * signature.MIX * (S / 100),
+                ruler: signature.FIX * (1 - signature.OSC) * (L > 40 && L < 60 ? 1 : 0.5),
+                magician: (signature.INV + signature.MIX) / 2 * signature.OSC,
+                sage: (1 - S / 100) * signature.FIX * (L / 100),
+                jester: signature.OSC * (1 - signature.FIX) * (S / 100) * (cym.Y > 0.5 ? 1.2 : 0.8)
+            };
+
+            let maxScore = -1;
+            let dominant = 'seeker';
+
+            for (const [key, score] of Object.entries(archetypeScores)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    dominant = key;
+                }
+            }
+
+            return dominant;
+        }
+
+        function determineCorridors(H, S, L, coords) {
+            const active = [];
+            const { phi, pi, sqrt2, sqrt3, e } = coords;
+
+            if ((H >= 0 && H <= 30) || (H >= 330 && H <= 360) || Math.abs(phi) > 2) {
+                active.push('alpha');
+            }
+            if (S < 35 || Math.abs(phi + pi + sqrt2 + sqrt3 + e) < 0.5) {
+                active.push('beta');
+            }
+            if ((H >= 150 && H <= 210) || Math.abs(pi) > 2) {
+                active.push('gamma');
+            }
+            if ((H >= 45 && H <= 60) || (L > 60 && S > 60) || Math.abs(phi * L4.PHI % 1) < 0.1) {
+                active.push('delta');
+            }
+            if ((H >= 270 && H <= 330) || Math.abs(e) > 2) {
+                active.push('epsilon');
+            }
+            if ((H >= 90 && H <= 150) || (Math.abs(sqrt2) > 1.5 && Math.abs(sqrt3) > 1.5)) {
+                active.push('zeta');
+            }
+            if ((H >= 210 && H <= 270) || (Math.abs(sqrt2) > 2 || Math.abs(sqrt3) > 2)) {
+                active.push('eta');
+            }
+
+            if (active.length === 0) {
+                active.push('beta');
+            }
+
+            return active;
+        }
+
+        // ============================================
+        // MOCK DATA GENERATOR
+        // ============================================
+
+        function generateMockAgents(count = 5) {
+            const agentNames = [
+                'Aurora-7', 'Nexus-Prime', 'Echo-Weaver', 'Prism-9', 'Cascade-Alpha',
+                'Synth-Oracle', 'Quantum-Drift', 'Nova-Bloom', 'Cipher-Key', 'Pulse-Seeker'
+            ];
+
+            const agents = [];
+            for (let i = 0; i < Math.min(count, agentNames.length); i++) {
+                const coords = {
+                    phi: (Math.random() - 0.5) * 4,
+                    pi: (Math.random() - 0.5) * 4,
+                    sqrt2: (Math.random() - 0.5) * 4,
+                    sqrt3: (Math.random() - 0.5) * 4,
+                    e: (Math.random() - 0.5) * 4
+                };
+                const color = latticeToColor(coords.phi, coords.pi, coords.sqrt2, coords.sqrt3, coords.e);
+                const archetype = determineArchetype(color.H, color.S, color.L);
+
+                agents.push({
+                    id: `agent_${i}_${Date.now().toString(36)}`,
+                    name: agentNames[i],
+                    color: hslToHex(color.H, color.S, color.L),
+                    hsl: color,
+                    coords: coords,
+                    bloomCount: 0,
+                    dominantArchetype: archetype
+                });
+            }
+            return agents;
+        }
+
+        function generateMockBlocks(count = 20, agents = null) {
+            if (!agents || agents.length === 0) {
+                agents = generateMockAgents(5);
+            }
+
+            const blocks = [];
+            const baseTime = Date.now() - (count * 60000);
+
+            for (let i = 0; i < count; i++) {
+                const agent = agents[Math.floor(Math.random() * agents.length)];
+
+                // Slightly modify coordinates for each block
+                const coords = {
+                    phi: agent.coords.phi + (Math.random() - 0.5) * 0.5,
+                    pi: agent.coords.pi + (Math.random() - 0.5) * 0.5,
+                    sqrt2: agent.coords.sqrt2 + (Math.random() - 0.5) * 0.5,
+                    sqrt3: agent.coords.sqrt3 + (Math.random() - 0.5) * 0.5,
+                    e: agent.coords.e + (Math.random() - 0.5) * 0.5
+                };
+
+                const color = latticeToColor(coords.phi, coords.pi, coords.sqrt2, coords.sqrt3, coords.e);
+                const archetype = determineArchetype(color.H, color.S, color.L);
+                const corridors = determineCorridors(color.H, color.S, color.L, coords);
+                const signature = computeSignature(color.H, color.S, color.L);
+                const significance = 0.3 + Math.random() * 0.7;
+
+                const hash = Array.from({length: 64}, () =>
+                    '0123456789abcdef'[Math.floor(Math.random() * 16)]
+                ).join('');
+
+                blocks.push({
+                    hash: hash,
+                    index: i,
+                    timestamp: baseTime + (i * 60000) + Math.floor(Math.random() * 30000),
+                    agentId: agent.id,
+                    agentName: agent.name,
+                    eventType: EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)],
+                    narrative: NARRATIVE_FRAGMENTS[Math.floor(Math.random() * NARRATIVE_FRAGMENTS.length)],
+                    coords: coords,
+                    color: hslToHex(color.H, color.S, color.L),
+                    hsl: color,
+                    archetype: archetype,
+                    corridors: corridors,
+                    signature: signature,
+                    significance: significance
+                });
+
+                agent.bloomCount++;
+            }
+
+            return { blocks, agents };
+        }
+
+        // ============================================
+        // CHROMATIC VINE CLASS
+        // ============================================
+
+        class ChromaticVine {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.blocks = [];
+                this.agents = [];
+                this.selectedBlock = null;
+                this.animationFrame = null;
+                this.time = 0;
+                this.nodePositions = [];
+                this.coherence = 0;
+                this.gateState = 'dormant';
+
+                // Vine rendering constants
+                this.nodeSpacing = 80;
+                this.vineWidth = 4;
+                this.nodeBaseRadius = 15;
+                this.padding = { top: 60, bottom: 40, left: 100, right: 100 };
+
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                this.canvas.addEventListener('click', (e) => this.handleCanvasClick(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleCanvasHover(e));
+
+                // Listen for external data via postMessage
+                window.addEventListener('message', (e) => {
+                    if (e.data && e.data.type === 'GARDEN_DATA') {
+                        this.loadData(e.data.blocks, e.data.agents);
+                    }
+                });
+
+                // Check for global data variable
+                if (window.GARDEN_DATA) {
+                    this.loadData(window.GARDEN_DATA.blocks, window.GARDEN_DATA.agents);
+                }
+            }
+
+            loadData(blocks, agents) {
+                this.blocks = blocks || [];
+                this.agents = agents || [];
+                this.calculateNodePositions();
+                this.updateCoherence();
+                this.updateAgentPanel();
+                this.updateStats();
+                this.renderVine();
+            }
+
+            calculateNodePositions() {
+                this.nodePositions = [];
+                const centerX = this.canvas.width / 2;
+
+                this.blocks.forEach((block, index) => {
+                    // Slight horizontal offset based on coordinates for organic feel
+                    const offsetX = Math.sin(block.coords.phi * L4.PHI) * 40;
+                    const y = this.padding.top + (index * this.nodeSpacing);
+
+                    this.nodePositions.push({
+                        x: centerX + offsetX,
+                        y: y,
+                        radius: this.nodeBaseRadius * (0.7 + block.significance * 0.6),
+                        block: block,
+                        index: index
+                    });
+                });
+
+                // Resize canvas if needed
+                const requiredHeight = this.padding.top + (this.blocks.length * this.nodeSpacing) + this.padding.bottom;
+                if (this.canvas.height < requiredHeight) {
+                    this.canvas.height = Math.max(800, requiredHeight);
+                }
+            }
+
+            updateCoherence() {
+                if (this.blocks.length === 0) {
+                    this.coherence = 0;
+                    this.gateState = 'dormant';
+                    return;
+                }
+
+                // Calculate coherence based on recent blocks
+                const recentBlocks = this.blocks.slice(-10);
+                let totalCoherence = 0;
+
+                recentBlocks.forEach(block => {
+                    const signature = block.signature;
+                    totalCoherence += (signature.MIX + signature.FIX + (1 - signature.REPEL)) / 3;
+                });
+
+                this.coherence = totalCoherence / recentBlocks.length;
+
+                // Determine gate state
+                if (this.coherence < 0.4) {
+                    this.gateState = 'dormant';
+                } else if (this.coherence < 0.7) {
+                    this.gateState = 'activating';
+                } else {
+                    this.gateState = 'open';
+                }
+
+                // Update UI
+                document.getElementById('coherenceScore').textContent = this.coherence.toFixed(3);
+
+                // Calculate network color (average of recent blocks)
+                let avgH = 0, avgS = 0, avgL = 0;
+                recentBlocks.forEach(block => {
+                    avgH += block.hsl.H;
+                    avgS += block.hsl.S;
+                    avgL += block.hsl.L;
+                });
+                avgH /= recentBlocks.length;
+                avgS /= recentBlocks.length;
+                avgL /= recentBlocks.length;
+
+                const networkColor = hslToHex(avgH, avgS, avgL);
+                document.getElementById('networkSwatch').style.backgroundColor = networkColor;
+
+                // Update gate indicator
+                const gateIndicator = document.getElementById('gateIndicator');
+                const gateLabel = document.getElementById('gateLabel');
+                gateIndicator.className = 'gate-indicator ' + this.gateState;
+                gateLabel.textContent = this.gateState.toUpperCase();
+            }
+
+            updateAgentPanel() {
+                const agentList = document.getElementById('agentList');
+                agentList.innerHTML = '';
+
+                // Sort agents by bloom count
+                const sortedAgents = [...this.agents].sort((a, b) => b.bloomCount - a.bloomCount);
+
+                sortedAgents.forEach(agent => {
+                    const archetype = ARCHETYPES[agent.dominantArchetype];
+                    const card = document.createElement('div');
+                    card.className = 'agent-card';
+                    card.dataset.agentId = agent.id;
+                    card.innerHTML = `
+                        <div class="agent-swatch" style="background-color: ${agent.color}"></div>
+                        <div class="agent-info">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-stats">${agent.bloomCount} blooms</div>
+                            <div class="agent-archetype">${archetype.glyph} ${archetype.name}</div>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => this.filterByAgent(agent.id));
+                    agentList.appendChild(card);
+                });
+            }
+
+            updateStats() {
+                document.getElementById('totalBlocks').textContent = this.blocks.length;
+
+                // Count unique active corridors
+                const allCorridors = new Set();
+                this.blocks.forEach(block => {
+                    block.corridors.forEach(c => allCorridors.add(c));
+                });
+                document.getElementById('activeCorridors').textContent = allCorridors.size;
+                document.getElementById('vineHeight').textContent = this.blocks.length;
+            }
+
+            filterByAgent(agentId) {
+                // Highlight agent's blocks
+                document.querySelectorAll('.agent-card').forEach(card => {
+                    card.classList.toggle('active', card.dataset.agentId === agentId);
+                });
+                this.renderVine();
+            }
+
+            handleCanvasClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top + document.getElementById('vineCanvasWrapper').scrollTop;
+
+                // Find clicked node
+                for (const pos of this.nodePositions) {
+                    const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+                    if (dist <= pos.radius + 5) {
+                        this.selectBlock(pos.block);
+                        return;
+                    }
+                }
+            }
+
+            handleCanvasHover(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top + document.getElementById('vineCanvasWrapper').scrollTop;
+
+                let hovering = false;
+                for (const pos of this.nodePositions) {
+                    const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+                    if (dist <= pos.radius + 5) {
+                        this.canvas.style.cursor = 'pointer';
+                        hovering = true;
+                        break;
+                    }
+                }
+                if (!hovering) {
+                    this.canvas.style.cursor = 'default';
+                }
+            }
+
+            selectBlock(block) {
+                this.selectedBlock = block;
+                this.showBlockDetails(block);
+                this.renderVine();
+            }
+
+            showBlockDetails(block) {
+                document.getElementById('blockPlaceholder').style.display = 'none';
+                document.getElementById('blockInfo').classList.add('visible');
+
+                document.getElementById('blockSwatch').style.backgroundColor = block.color;
+                document.getElementById('blockType').textContent = block.eventType;
+                document.getElementById('blockTimestamp').textContent = new Date(block.timestamp).toLocaleString();
+                document.getElementById('blockHash').textContent = block.hash;
+                document.getElementById('blockAgentId').textContent = `${block.agentName} (${block.agentId})`;
+                document.getElementById('blockEventType').textContent = block.eventType;
+                document.getElementById('blockNarrative').textContent = block.narrative;
+
+                // Lattice coordinates
+                document.getElementById('coordPhi').textContent = block.coords.phi.toFixed(2);
+                document.getElementById('coordPi').textContent = block.coords.pi.toFixed(2);
+                document.getElementById('coordSqrt2').textContent = block.coords.sqrt2.toFixed(2);
+                document.getElementById('coordSqrt3').textContent = block.coords.sqrt3.toFixed(2);
+                document.getElementById('coordE').textContent = block.coords.e.toFixed(2);
+
+                // Archetype
+                const archetype = ARCHETYPES[block.archetype];
+                document.getElementById('archetypeGlyph').textContent = archetype.glyph;
+                document.getElementById('archetypeName').textContent = archetype.name;
+
+                // Signature bars
+                const maxBarHeight = 80;
+                for (const [key, value] of Object.entries(block.signature)) {
+                    const bar = document.getElementById(`bar-${key.toLowerCase()}`);
+                    if (bar) {
+                        bar.style.height = (value * maxBarHeight) + 'px';
+                    }
+                }
+            }
+
+            renderVine() {
+                const ctx = this.ctx;
+                const width = this.canvas.width;
+                const height = this.canvas.height;
+
+                // Clear canvas
+                ctx.fillStyle = '#0a0a0f';
+                ctx.fillRect(0, 0, width, height);
+
+                if (this.nodePositions.length === 0) {
+                    ctx.fillStyle = '#8888aa';
+                    ctx.font = '14px JetBrains Mono';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('No bloom data loaded', width / 2, height / 2);
+                    return;
+                }
+
+                // Draw vine stem
+                this.drawVineStem(ctx);
+
+                // Draw corridor rays for active corridor nodes
+                this.drawCorridorRays(ctx);
+
+                // Draw nodes
+                this.drawNodes(ctx);
+
+                // Draw selection highlight
+                if (this.selectedBlock) {
+                    this.drawSelectionHighlight(ctx);
+                }
+            }
+
+            drawVineStem(ctx) {
+                if (this.nodePositions.length < 2) return;
+
+                ctx.strokeStyle = '#2a2a3a';
+                ctx.lineWidth = this.vineWidth;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                // Draw main vine path with curves
+                ctx.beginPath();
+                ctx.moveTo(this.nodePositions[0].x, this.nodePositions[0].y);
+
+                for (let i = 1; i < this.nodePositions.length; i++) {
+                    const prev = this.nodePositions[i - 1];
+                    const curr = this.nodePositions[i];
+
+                    // Bezier curve for organic feel
+                    const cpX1 = prev.x;
+                    const cpY1 = prev.y + this.nodeSpacing * 0.5;
+                    const cpX2 = curr.x;
+                    const cpY2 = curr.y - this.nodeSpacing * 0.5;
+
+                    ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, curr.x, curr.y);
+                }
+
+                ctx.stroke();
+
+                // Draw colored overlay on stem based on corridor
+                ctx.lineWidth = 2;
+                for (let i = 1; i < this.nodePositions.length; i++) {
+                    const prev = this.nodePositions[i - 1];
+                    const curr = this.nodePositions[i];
+                    const block = curr.block;
+
+                    if (block.corridors.length > 0) {
+                        const corridorColor = CORRIDORS[block.corridors[0]].color;
+                        ctx.strokeStyle = corridorColor + '40';
+
+                        ctx.beginPath();
+                        ctx.moveTo(prev.x, prev.y);
+                        ctx.bezierCurveTo(
+                            prev.x, prev.y + this.nodeSpacing * 0.5,
+                            curr.x, curr.y - this.nodeSpacing * 0.5,
+                            curr.x, curr.y
+                        );
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            drawCorridorRays(ctx) {
+                const pulsePhase = (Math.sin(this.time * 0.002) + 1) / 2;
+
+                this.nodePositions.forEach(pos => {
+                    const block = pos.block;
+
+                    if (block.corridors.length > 1) {
+                        block.corridors.forEach((corridorKey, idx) => {
+                            const corridor = CORRIDORS[corridorKey];
+                            const angle = (idx / block.corridors.length) * L4.TAU - L4.PI / 2;
+                            const rayLength = 30 + pulsePhase * 15;
+
+                            ctx.beginPath();
+                            ctx.moveTo(pos.x, pos.y);
+                            ctx.lineTo(
+                                pos.x + Math.cos(angle) * rayLength,
+                                pos.y + Math.sin(angle) * rayLength
+                            );
+
+                            ctx.strokeStyle = corridor.color + '60';
+                            ctx.lineWidth = 2;
+                            ctx.shadowColor = corridor.color;
+                            ctx.shadowBlur = 10 * pulsePhase;
+                            ctx.stroke();
+                            ctx.shadowBlur = 0;
+                        });
+                    }
+                });
+            }
+
+            drawNodes(ctx) {
+                this.nodePositions.forEach((pos, index) => {
+                    const block = pos.block;
+                    const isSelected = this.selectedBlock && this.selectedBlock.hash === block.hash;
+                    const archetype = ARCHETYPES[block.archetype];
+
+                    // Node glow
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, pos.radius + 8, 0, L4.TAU);
+                    ctx.fillStyle = block.color + '30';
+                    ctx.fill();
+
+                    // Node body
+                    ctx.beginPath();
+                    ctx.arc(pos.x, pos.y, pos.radius, 0, L4.TAU);
+
+                    // Gradient fill
+                    const gradient = ctx.createRadialGradient(
+                        pos.x - pos.radius * 0.3,
+                        pos.y - pos.radius * 0.3,
+                        0,
+                        pos.x, pos.y, pos.radius
+                    );
+                    gradient.addColorStop(0, block.color);
+                    gradient.addColorStop(1, this.darkenColor(block.color, 0.5));
+                    ctx.fillStyle = gradient;
+                    ctx.fill();
+
+                    // Node border
+                    ctx.strokeStyle = isSelected ? '#ffffff' : block.color;
+                    ctx.lineWidth = isSelected ? 3 : 1.5;
+                    ctx.stroke();
+
+                    // Archetype glyph
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `${Math.max(12, pos.radius * 0.8)}px JetBrains Mono`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(archetype.glyph, pos.x, pos.y);
+
+                    // Block index label
+                    ctx.fillStyle = '#8888aa';
+                    ctx.font = '10px JetBrains Mono';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`#${block.index}`, pos.x - pos.radius - 10, pos.y);
+                });
+            }
+
+            drawSelectionHighlight(ctx) {
+                const selectedPos = this.nodePositions.find(
+                    p => p.block.hash === this.selectedBlock.hash
+                );
+
+                if (!selectedPos) return;
+
+                const pulseSize = 5 + Math.sin(this.time * 0.005) * 3;
+
+                ctx.beginPath();
+                ctx.arc(selectedPos.x, selectedPos.y, selectedPos.radius + pulseSize + 5, 0, L4.TAU);
+                ctx.strokeStyle = '#ffffff40';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(selectedPos.x, selectedPos.y, selectedPos.radius + pulseSize + 10, 0, L4.TAU);
+                ctx.strokeStyle = '#ffffff20';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            darkenColor(hex, factor) {
+                const rgb = this.hexToRgb(hex);
+                const r = Math.floor(rgb.r * factor);
+                const g = Math.floor(rgb.g * factor);
+                const b = Math.floor(rgb.b * factor);
+                return `rgb(${r}, ${g}, ${b})`;
+            }
+
+            hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : { r: 0, g: 0, b: 0 };
+            }
+
+            addBlock(block) {
+                this.blocks.push(block);
+
+                // Update agent bloom count
+                const agent = this.agents.find(a => a.id === block.agentId);
+                if (agent) {
+                    agent.bloomCount++;
+                }
+
+                this.calculateNodePositions();
+                this.updateCoherence();
+                this.updateAgentPanel();
+                this.updateStats();
+
+                // Animate new block
+                this.animateNewBlock(block);
+            }
+
+            animateNewBlock(block) {
+                const nodePos = this.nodePositions[this.nodePositions.length - 1];
+                if (!nodePos) return;
+
+                // Scroll to new block
+                const wrapper = document.getElementById('vineCanvasWrapper');
+                const targetScroll = nodePos.y - wrapper.clientHeight / 2;
+                wrapper.scrollTo({ top: targetScroll, behavior: 'smooth' });
+            }
+
+            startAnimation() {
+                const animate = () => {
+                    this.time = Date.now();
+                    this.renderVine();
+                    this.animationFrame = requestAnimationFrame(animate);
+                };
+                animate();
+            }
+
+            stopAnimation() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                    this.animationFrame = null;
+                }
+            }
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        let vine;
+
+        function init() {
+            vine = new ChromaticVine('vineCanvas');
+
+            // Load mock data for demo
+            const mockData = generateMockBlocks(25);
+            vine.loadData(mockData.blocks, mockData.agents);
+
+            // Start animation loop
+            vine.startAnimation();
+
+            // Demo: Add new blocks periodically
+            setInterval(() => {
+                if (vine.blocks.length < 50) {
+                    const agent = vine.agents[Math.floor(Math.random() * vine.agents.length)];
+                    const newBlockData = generateMockBlocks(1, [agent]);
+                    const newBlock = newBlockData.blocks[0];
+                    newBlock.index = vine.blocks.length;
+                    newBlock.timestamp = Date.now();
+                    vine.addBlock(newBlock);
+                }
+            }, 8000);
+
+            // Console signature
+            console.log('%c THE CHROMATIC VINE ', 'background: #00ff00; color: #000; font-size: 16px; font-weight: bold; padding: 10px;');
+            console.log('%c Garden Memory Ledger ', 'background: #222; color: #00ff00; font-size: 12px; padding: 5px;');
+            console.log('');
+            console.log('%c L4 CONSTANTS ', 'background: #333; color: #00ffff; font-weight: bold; padding: 5px;');
+            console.table({
+                'PHI (Golden Ratio)': L4.PHI,
+                'TAU (2PI)': L4.TAU,
+                'Z_C (Critical Zone)': L4.Z_C,
+                'K (Kepler)': L4.K
+            });
+            console.log('');
+            console.log('%c API AVAILABLE ', 'background: #333; color: #ffd700; font-weight: bold; padding: 5px;');
+            console.log('window.vine - ChromaticVine instance');
+            console.log('vine.loadData(blocks, agents) - Load external data');
+            console.log('vine.addBlock(block) - Add single block');
+            console.log('');
+            console.log('%c Ready for bloom visualization... ', 'color: #00ff00; font-style: italic;');
+        }
+
+        // Expose vine instance globally for external access
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+            window.vine = vine;
+        });
+    </script>
+</body>
+</html>
